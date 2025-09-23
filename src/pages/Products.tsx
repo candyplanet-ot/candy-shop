@@ -3,10 +3,6 @@ import { ShoppingCart, Eye, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import iconLollipop from "@/assets/icon-lollipop.png";
-import iconGummy from "@/assets/icon-gummy.png";
-import iconCottonCandy from "@/assets/icon-cotton-candy.png";
-import iconChocolate from "@/assets/icon-chocolate.png";
 
 const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -19,7 +15,7 @@ const Products = () => {
       name: "Rainbow Swirl Lollipops",
       category: "Lollipops",
       price: "€4.99",
-      image: iconLollipop,
+      image: "/product-1.jpg",
       featured: true,
       description: "Handcrafted rainbow lollipops with natural fruit flavors",
     },
@@ -28,7 +24,7 @@ const Products = () => {
       name: "Premium Chocolate Truffles",
       category: "Chocolates",
       price: "€12.99",
-      image: iconChocolate,
+      image: "/project-2.jpg",
       featured: true,
       description: "Belgian chocolate truffles with exotic fillings",
     },
@@ -37,7 +33,7 @@ const Products = () => {
       name: "Magical Gummy Bears",
       category: "Gummies",
       price: "€6.99",
-      image: iconGummy,
+      image: "/project-3.jpg",
       featured: false,
       description: "Soft, chewy gummies in 12 magical flavors",
     },
@@ -46,7 +42,7 @@ const Products = () => {
       name: "Cloud Cotton Candy",
       category: "Cotton Candy",
       price: "€3.99",
-      image: iconCottonCandy,
+      image: "/project-4.jpg",
       featured: false,
       description: "Fluffy cotton candy that melts in your mouth",
     },
@@ -55,7 +51,7 @@ const Products = () => {
       name: "Unicorn Chocolate Bars",
       category: "Chocolates",
       price: "€8.99",
-      image: iconChocolate,
+      image: "/project-5.jpg",
       featured: true,
       description: "White chocolate bars with colorful sprinkles",
     },
@@ -64,7 +60,7 @@ const Products = () => {
       name: "Fruit Explosion Gummies",
       category: "Gummies",
       price: "€7.99",
-      image: iconGummy,
+      image: "/project-6.jpg",
       featured: false,
       description: "Intense fruit flavors in fun shapes",
     },
@@ -133,7 +129,7 @@ const Products = () => {
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-24 h-24 object-contain float-animation group-hover:scale-110 transition-transform duration-300"
+                      className="w-24 h-24 object-contain group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>
 
