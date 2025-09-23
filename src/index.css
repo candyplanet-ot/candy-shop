@@ -1,0 +1,197 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Magical Candy Universe Design System - All colors MUST be HSL */
+
+@layer base {
+  :root {
+    /* Candy Color Palette (converted to HSL) */
+    --candy-pink: 334 100% 70%;      /* #FF6FB5 - Bubblegum Pink */
+    --candy-blue: 196 100% 71%;      /* #6FCFFF - Sky Blue */
+    --candy-yellow: 51 100% 71%;     /* #FFE46B - Lemon Yellow */
+    --candy-mint: 167 100% 74%;      /* #7FFFD4 - Mint Green */
+    
+    /* Gradients */
+    --gradient-candy: linear-gradient(135deg, hsl(var(--candy-pink)), hsl(var(--candy-blue)));
+    --gradient-magical: linear-gradient(135deg, hsl(var(--candy-blue)), hsl(var(--candy-mint)));
+    --gradient-sweet: linear-gradient(135deg, hsl(var(--candy-yellow)), hsl(var(--candy-pink)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--candy-pink)), hsl(var(--candy-blue)), hsl(var(--candy-mint)));
+    
+    /* Shadows & Glows */
+    --shadow-candy: 0 10px 30px -10px hsl(var(--candy-pink) / 0.3);
+    --shadow-magical: 0 20px 40px -15px hsl(var(--candy-blue) / 0.4);
+    --glow-pink: 0 0 20px hsl(var(--candy-pink) / 0.5);
+    --glow-blue: 0 0 20px hsl(var(--candy-blue) / 0.5);
+    --glow-mint: 0 0 20px hsl(var(--candy-mint) / 0.5);
+    
+    /* Base theme colors */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 334 100% 70%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 196 100% 71%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 334 100% 70%;
+    --radius: 1rem;
+    
+    /* Sidebar */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 334 100% 70%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 196 100% 71%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 334 100% 70%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-poppins;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-baloo font-bold;
+  }
+}
+
+@layer components {
+  /* Shine Border Animation */
+  .shine-border {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .shine-border::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, hsl(var(--candy-pink) / 0.4), transparent);
+    animation: shine 2s infinite;
+    z-index: 1;
+  }
+  
+  @keyframes shine {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+  
+  /* Neon Gradient Card */
+  .neon-gradient-card {
+    position: relative;
+    background: linear-gradient(135deg, hsl(var(--candy-pink) / 0.1), hsl(var(--candy-blue) / 0.1));
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  
+  .neon-gradient-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    background: var(--gradient-candy);
+    border-radius: inherit;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    -webkit-mask-composite: xor;
+    z-index: -1;
+  }
+  
+  /* Floating Animation */
+  .float-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+  
+  /* Interactive Hover Effects */
+  .hover-bounce {
+    transition: transform 0.3s ease;
+  }
+  
+  .hover-bounce:hover {
+    transform: translateY(-5px);
+  }
+  
+  .hover-tilt {
+    transition: transform 0.3s ease;
+  }
+  
+  .hover-tilt:hover {
+    transform: perspective(1000px) rotateX(5deg) rotateY(5deg);
+  }
+  
+  .hover-glow {
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .hover-glow:hover {
+    box-shadow: var(--glow-pink);
+  }
+  
+  /* Candy Stripe Divider */
+  .candy-stripe {
+    background: repeating-linear-gradient(
+      45deg,
+      hsl(var(--candy-pink)),
+      hsl(var(--candy-pink)) 10px,
+      hsl(var(--candy-blue)) 10px,
+      hsl(var(--candy-blue)) 20px
+    );
+    opacity: 0.7;
+  }
+}
