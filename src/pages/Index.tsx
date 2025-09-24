@@ -3,12 +3,41 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import heroImage from "@/assets/hero-candy-land.jpg";
 import featuredCandies from "@/assets/featured-candies.jpg";
-import iconLollipop from "@/assets/icon-lollipop.png";
-import iconGummy from "@/assets/icon-gummy.png";
-import iconCottonCandy from "@/assets/icon-cotton-candy.png";
-import iconChocolate from "@/assets/icon-chocolate.png";
-import { useState } from "react";
+import { useState, Suspense, useMemo } from "react";
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 import { Link } from "react-router-dom";
+import { Canvas } from "@react-three/fiber";
+import { Environment, Float, ContactShadows, AdaptiveDpr, useGLTF, OrbitControls, Preload } from "@react-three/drei";
+
+// 3D Candy centerpiece component
+function CandyModel(props: { mobile?: boolean }) {
+  // Try to load a glTF model placed at public/models/candy.glb
+  // If not present, render a glossy torus-knot as a tasteful fallback
+  let gltf: any | null = null;
+  try {
+    gltf = useGLTF("/models/candy.glb");
+  } catch {
+    gltf = null;
+  }
+
+  const materialProps = useMemo(
+    () => ({ color: "#ff8ac9", roughness: 0.2, metalness: 0.6 }),
+    []
+  );
+
+  return (
+    <group rotation={[0, 0, 0]}>
+      {gltf ? (
+        <primitive object={gltf.scene} scale={props.mobile ? 0.6 : 0.7} />
+      ) : (
+        <mesh scale={props.mobile ? 0.5 : 0.6}>
+          <torusKnotGeometry args={[1, 0.35, 256, 32]} />
+          <meshStandardMaterial {...materialProps} />
+        </mesh>
+      )}
+    </group>
+  );
+}
 
 const Index = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -17,25 +46,25 @@ const Index = () => {
     {
       name: "Rainbow Swirl Lollipops",
       price: "€4.99",
-      image: iconLollipop,
+      image: "/product-1.png",
       description: "Handcrafted rainbow lollipops with natural fruit flavors"
     },
     {
       name: "Premium Chocolate Truffles", 
       price: "€12.99",
-      image: iconChocolate,
+      image: "/product-2.png",
       description: "Belgian chocolate truffles with exotic fillings"
     },
     {
       name: "Magical Gummy Bears",
       price: "€6.99", 
-      image: iconGummy,
+      image: "/product-3.png",
       description: "Soft, chewy gummies in 12 magical flavors"
     },
     {
       name: "Cloud Cotton Candy",
       price: "€3.99",
-      image: iconCottonCandy,
+      image: "/product-4.png",
       description: "Fluffy cotton candy that melts in your mouth"
     }
   ];
@@ -74,54 +103,109 @@ const Index = () => {
   return (
     <div className="pt-16">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen overflow-hidden flex items-center">
+        {/* Parallax background */}
         <div 
           className="absolute inset-0 bg-cover bg-center scale-110"
           style={{ backgroundImage: `url(${heroImage})` }}
         />
-        <div className="absolute inset-0 bg-gradient-hero opacity-60" />
-        
-        {/* Floating 3D Elements */}
-        <div className="absolute top-20 left-10 float-animation">
-          <img src={iconLollipop} alt="Floating Lollipop" className="w-16 h-16 opacity-70" />
-        </div>
-        <div className="absolute top-40 right-20 float-animation" style={{ animationDelay: "2s" }}>
-          <img src={iconGummy} alt="Floating Gummy" className="w-20 h-20 opacity-70" />
-        </div>
-        <div className="absolute bottom-32 left-16 float-animation" style={{ animationDelay: "4s" }}>
-          <img src={iconCottonCandy} alt="Floating Cotton Candy" className="w-18 h-18 opacity-70" />
-        </div>
-        <div className="absolute top-60 left-1/4 float-animation" style={{ animationDelay: "1s" }}>
-          <img src={iconChocolate} alt="Floating Chocolate" className="w-14 h-14 opacity-70" />
+        <div className="absolute inset-0 bg-gradient-hero opacity-70" />
+
+        {/* 3D Model directly in hero background */}
+        <div className="absolute inset-0 z-0">
+          <Canvas 
+            dpr={[1, 1.5]} 
+            camera={{ position: [0, 0, 3.0], fov: 55 }} 
+            gl={{ alpha: true, antialias: true }}
+            className="w-full h-full"
+          >
+            <AdaptiveDpr pixelated />
+            <ambientLight intensity={0.6} />
+            <directionalLight position={[2, 4, 3]} intensity={1} />
+            <Suspense fallback={null}>
+              {/* Floating candies (ambient) */}
+              <Float speed={1} rotationIntensity={0.4} floatIntensity={0.6}>
+                <mesh position={[-2, 1.2, -1]} scale={0.3}>
+                  <icosahedronGeometry args={[1, 0]} />
+                  <meshStandardMaterial color="#6FCFFF" metalness={0.5} roughness={0.25} />
+                </mesh>
+              </Float>
+              <Float speed={1.2} rotationIntensity={0.3} floatIntensity={0.7}>
+                <mesh position={[1.8, -0.6, -1.4]} scale={0.25}>
+                  <sphereGeometry args={[1, 32, 32]} />
+                  <meshStandardMaterial color="#FF6FB5" metalness={0.55} roughness={0.2} />
+                </mesh>
+              </Float>
+              <Float speed={0.8} rotationIntensity={0.35} floatIntensity={0.5}>
+                <mesh position={[0.2, 1.8, -1.2]} scale={0.22}>
+                  <dodecahedronGeometry args={[1, 0]} />
+                  <meshStandardMaterial color="#7FFFD4" metalness={0.45} roughness={0.25} />
+                </mesh>
+              </Float>
+
+              {/* Main centerpiece with floating animation */}
+              <Float speed={2} rotationIntensity={0.2} floatIntensity={0.4}>
+                <group rotation={[0, 0, 0]}>
+                  <CandyModel />
+                </group>
+              </Float>
+
+              <Environment preset="sunset" />
+              <ContactShadows position={[0, -1.3, 0]} opacity={0.15} scale={8} blur={2} far={2.5} />
+              <Preload all />
+            </Suspense>
+            <OrbitControls enablePan={false} enableZoom={false} autoRotate autoRotateSpeed={0.8} />
+          </Canvas>
         </div>
 
-        <div className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
-          <h1 className="text-6xl md:text-8xl font-baloo font-bold mb-6 animate-fade-in bg-gradient-hero bg-clip-text text-transparent">
-            Welcome to Candy Planet
-          </h1>
-          <p className="text-2xl md:text-3xl font-poppins mb-12 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            Where sweet dreams come true — discover treats made to delight every moment
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-6 justify-center animate-fade-in" style={{ animationDelay: "0.4s" }}>
-            <Link to="/products">
-              <Button variant="hero" size="lg" className="shine-border hover-bounce">
-                Explore Our Candies
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-            <Link to="/about">
-              <Button variant="magical" size="lg" className="hover-bounce">
-                Our Story
-              </Button>
-            </Link>
-          </div>
-        </div>
+        {/* Content overlay */}
+        <div className="relative z-10 container mx-auto px-4 py-20 lg:py-28">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="font-poppins text-white/80 mb-3 animate-fade-in">A Treat World Awaits 🍬</div>
+            <h1 className="text-5xl md:text-7xl font-baloo font-bold mb-4 animate-fade-in text-white text-shadow">
+              Welcome to <span className="bg-gradient-to-r from-pink-400 via-purple-500 to-pink-600 bg-clip-text text-transparent">Candy</span> Planet
+            </h1>
+            <p className="text-xl md:text-2xl font-poppins mb-8 animate-fade-in text-white/90 max-w-2xl mx-auto">
+              Handcrafted treats made to delight every moment.
+            </p>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-white/70 rounded-full mt-2 animate-pulse" />
+            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
+              <Link to="/products">
+                <Button
+                  variant="default"
+                  className="group relative rounded-xl bg-gradient-candy text-white border-0 px-8 py-6 text-lg shine-border hover:shadow-magical hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+                >
+                  <span className="relative z-10 flex items-center">
+                    Explore Our Products
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                </Button>
+              </Link>
+              <Link to="/about">
+                <Button
+                  variant="outline"
+                  className="group rounded-xl bg-black/20 border-2 border-white/30 text-white hover:bg-white/10 hover:text-white hover:border-white/50 hover:-translate-y-1 px-8 py-6 text-lg transition-all duration-300"
+                >
+                  Our Story
+                  <Heart className="w-4 h-4 ml-2 group-hover:scale-110 transition-transform" />
+                </Button>
+              </Link>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="mt-8 flex flex-wrap justify-center gap-4">
+              <div className="px-4 py-3 rounded-2xl bg-gradient-to-r from-pink-500/20 to-purple-500/20 backdrop-blur-sm border border-white/20 text-white text-sm font-poppins shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                ⭐ Trusted by 10,000+ sweet lovers
+              </div>
+              <div className="px-4 py-3 rounded-2xl bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-sm border border-white/20 text-white text-sm font-poppins shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                🍃 Organic Ingredients
+              </div>
+              <div className="px-4 py-3 rounded-2xl bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-sm border border-white/20 text-white text-sm font-poppins shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+                🍬 Handcrafted Treats
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -150,7 +234,7 @@ const Index = () => {
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-16 h-16 object-contain float-animation"
+                      className="w-16 h-16 object-contain"
                     />
                   </div>
                   <h3 className="text-xl font-baloo font-bold mb-2 group-hover:text-primary transition-colors">
@@ -162,9 +246,11 @@ const Index = () => {
                   <div className="text-2xl font-baloo font-bold text-primary mb-4">
                     {product.price}
                   </div>
-                  <Button variant="sweet" className="w-full hover-bounce">
-                    Order Now
-                  </Button>
+                  <Link to="/products">
+                    <Button variant="sweet" className="w-full hover-bounce">
+                      Order Now
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             ))}
@@ -172,71 +258,29 @@ const Index = () => {
 
           {/* Mobile Carousel */}
           <div className="md:hidden relative">
-            <div className="flex overflow-hidden">
-              <div 
-                className="flex transition-transform duration-300 ease-in-out"
-                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-              >
+            <Carousel className="w-full">
+              <CarouselContent>
                 {featuredProducts.map((product, index) => (
-                  <div key={index} className="w-full flex-shrink-0 px-4">
+                  <CarouselItem key={index} className="px-3">
                     <Card className="neon-gradient-card">
-                      <CardContent className="p-6 text-center">
-                        <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-primary/10 to-accent/10 rounded-full flex items-center justify-center">
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-16 h-16 object-contain"
-                          />
+                      <CardContent className="p-5 text-center">
+                        <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-primary/10 to-accent/10 rounded-full flex items-center justify-center">
+                          <img src={product.image} alt={product.name} className="w-14 h-14 object-contain" />
                         </div>
-                        <h3 className="text-xl font-baloo font-bold mb-2">
-                          {product.name}
-                        </h3>
-                        <p className="font-poppins text-sm text-muted-foreground mb-4">
-                          {product.description}
-                        </p>
-                        <div className="text-2xl font-baloo font-bold text-primary mb-4">
-                          {product.price}
-                        </div>
-                        <Button variant="sweet" className="w-full">
-                          Order Now
-                        </Button>
+                        <h3 className="text-lg font-baloo font-bold mb-2">{product.name}</h3>
+                        <p className="font-poppins text-sm text-muted-foreground mb-3">{product.description}</p>
+                        <div className="text-xl font-baloo font-bold text-primary mb-3">{product.price}</div>
+                        <Link to="/products">
+                          <Button variant="sweet" className="w-full">Order Now</Button>
+                        </Link>
                       </CardContent>
                     </Card>
-                  </div>
+                  </CarouselItem>
                 ))}
-              </div>
-            </div>
-            
-            {/* Carousel Controls */}
-            <Button 
-              variant="outline"
-              size="icon"
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-background/80 backdrop-blur"
-              onClick={prevSlide}
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <Button 
-              variant="outline"
-              size="icon"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-background/80 backdrop-blur"
-              onClick={nextSlide}
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-            
-            {/* Dots indicator */}
-            <div className="flex justify-center mt-6 gap-2">
-              {featuredProducts.map((_, index) => (
-                <button
-                  key={index}
-                  className={`w-3 h-3 rounded-full transition-colors ${
-                    index === currentSlide ? "bg-primary" : "bg-primary/30"
-                  }`}
-                  onClick={() => setCurrentSlide(index)}
-                />
-              ))}
-            </div>
+              </CarouselContent>
+              <CarouselPrevious className="left-2 bg-background/90" />
+              <CarouselNext className="right-2 bg-background/90" />
+            </Carousel>
           </div>
         </div>
       </section>
@@ -336,9 +380,6 @@ const Index = () => {
                 <Link to="/products" className="block text-background/80 hover:text-primary transition-colors">
                   Our Products
                 </Link>
-                <div className="block text-background/80 hover:text-primary transition-colors cursor-pointer">
-                  Custom Orders
-                </div>
               </div>
             </div>
 

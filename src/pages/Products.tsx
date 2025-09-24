@@ -1,13 +1,17 @@
 import { useState } from "react";
-import { ShoppingCart, Eye, Filter } from "lucide-react";
+import { ShoppingCart, Instagram, Facebook } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/lib/supabaseClient";
+import { useCart } from "@/context/CartContext";
+import { useToast } from "@/components/ui/use-toast";
+import { Link } from "react-router-dom";
 
 const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
-
-  const categories = ["All", "Chocolates", "Gummies", "Lollipops", "Cotton Candy"];
+  const { addItem } = useCart();
+  const { toast } = useToast();
 
   const products = [
     {
@@ -15,7 +19,7 @@ const Products = () => {
       name: "Rainbow Swirl Lollipops",
       category: "Lollipops",
       price: "€4.99",
-      image: "/product-1.jpg",
+      image: "/product-1.png",
       featured: true,
       description: "Handcrafted rainbow lollipops with natural fruit flavors",
     },
@@ -24,7 +28,7 @@ const Products = () => {
       name: "Premium Chocolate Truffles",
       category: "Chocolates",
       price: "€12.99",
-      image: "/project-2.jpg",
+      image: "/product-2.png",
       featured: true,
       description: "Belgian chocolate truffles with exotic fillings",
     },
@@ -33,7 +37,7 @@ const Products = () => {
       name: "Magical Gummy Bears",
       category: "Gummies",
       price: "€6.99",
-      image: "/project-3.jpg",
+      image: "/product-3.png",
       featured: false,
       description: "Soft, chewy gummies in 12 magical flavors",
     },
@@ -42,7 +46,7 @@ const Products = () => {
       name: "Cloud Cotton Candy",
       category: "Cotton Candy",
       price: "€3.99",
-      image: "/project-4.jpg",
+      image: "/product-4.png",
       featured: false,
       description: "Fluffy cotton candy that melts in your mouth",
     },
@@ -51,7 +55,7 @@ const Products = () => {
       name: "Unicorn Chocolate Bars",
       category: "Chocolates",
       price: "€8.99",
-      image: "/project-5.jpg",
+      image: "/product-5.png",
       featured: true,
       description: "White chocolate bars with colorful sprinkles",
     },
@@ -60,15 +64,40 @@ const Products = () => {
       name: "Fruit Explosion Gummies",
       category: "Gummies",
       price: "€7.99",
-      image: "/project-6.jpg",
+      image: "/product-6.png",
       featured: false,
       description: "Intense fruit flavors in fun shapes",
     },
+    {
+      id: 7,
+      name: "Caramel Crunch Bites",
+      category: "Chocolates",
+      price: "€5.99",
+      image: "/product-7.png",
+      featured: false,
+      description: "Buttery caramel coated in rich chocolate with a crispy bite",
+    },
+    {
+      id: 8,
+      name: "Sour Spark Gummies",
+      category: "Gummies",
+      price: "€4.49",
+      image: "/product-8.png",
+      featured: false,
+      description: "Tangy, sour-coated gummies for a zesty kick",
+    },
+    {
+      id: 9,
+      name: "Twist Pop Lollies",
+      category: "Lollipops",
+      price: "€3.49",
+      image: "/product-9.png",
+      featured: false,
+      description: "Colorful twist lollipops with fruity flavors",
+    },
   ];
 
-  const filteredProducts = selectedCategory === "All" 
-    ? products 
-    : products.filter(product => product.category === selectedCategory);
+
 
   return (
     <div className="pt-16">
@@ -84,56 +113,33 @@ const Products = () => {
         </div>
       </section>
 
-      {/* Category Filter */}
-      <section className="py-12 border-b border-border">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-wrap justify-center gap-4">
-            <Filter className="w-5 h-5 text-muted-foreground mt-2" />
-            {categories.map((category) => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                onClick={() => setSelectedCategory(category)}
-                className={`rounded-full ${
-                  selectedCategory === category 
-                    ? "bg-gradient-candy text-white hover:opacity-90" 
-                    : "hover:bg-secondary"
-                }`}
-              >
-                {category}
-              </Button>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Products Grid */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {filteredProducts.map((product) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+            {products.map((product) => (
               <Card 
                 key={product.id}
                 className={`group hover-tilt hover-bounce transition-all duration-300 overflow-hidden ${
                   product.featured ? "neon-gradient-card" : ""
                 }`}
               >
-                <CardContent className="p-6">
+                <CardContent className="p-4 md:p-6">
                   {product.featured && (
                     <Badge className="mb-4 bg-gradient-sweet text-white shine-border">
                       ✨ Featured
                     </Badge>
                   )}
                   
-                  <div className="aspect-square mb-6 flex items-center justify-center bg-gradient-to-br from-secondary/20 to-accent/20 rounded-2xl overflow-hidden">
+                  <div className="aspect-square mb-4 md:mb-6 flex items-center justify-center bg-gradient-to-br from-secondary/20 to-accent/20 rounded-2xl overflow-hidden">
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="w-24 h-24 object-contain group-hover:scale-110 transition-transform duration-300"
+                      className={`${product.name === "Fruit Explosion Gummies" ? "w-[190px] h-[190px]" : "w-24 h-24"} object-contain group-hover:scale-110 transition-transform duration-300`}
                     />
                   </div>
 
-                  <h3 className="text-xl font-baloo font-bold mb-2 text-foreground group-hover:text-primary transition-colors">
+                  <h3 className="text-lg md:text-xl font-baloo font-bold mb-2 text-foreground group-hover:text-primary transition-colors">
                     {product.name}
                   </h3>
                   
@@ -151,16 +157,14 @@ const Products = () => {
                     <Button 
                       variant="default" 
                       className="flex-1 bg-gradient-candy hover:opacity-90 text-white border-0"
+                      onClick={() => {
+                        const priceNumber = Number(String(product.price).replace(/[^0-9.]/g, ""));
+                        addItem({ id: String(product.id), name: product.name, price: priceNumber, imageUrl: product.image });
+                        toast({ title: "Added to cart", description: product.name });
+                      }}
                     >
                       <ShoppingCart className="w-4 h-4 mr-2" />
                       Add to Cart
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="icon"
-                      className="hover:bg-secondary"
-                    >
-                      <Eye className="w-4 h-4" />
                     </Button>
                   </div>
                 </CardContent>
@@ -170,20 +174,69 @@ const Products = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-primary/10 to-accent/10">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-baloo font-bold bg-gradient-sweet bg-clip-text text-transparent mb-6">
-            Can't Find What You're Looking For?
-          </h2>
-          <p className="text-xl font-poppins text-muted-foreground mb-8 max-w-2xl mx-auto">
-            We create custom candy collections for special occasions. Let us make your sweet dreams come true!
-          </p>
-          <Button variant="hero" size="lg" className="shine-border hover-bounce">
-            Request Custom Order
-          </Button>
+      {/* Footer */}
+      <footer className="bg-foreground text-background py-16">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Brand */}
+            <div className="space-y-4">
+              <h3 className="font-fredoka text-3xl font-bold bg-gradient-candy bg-clip-text text-transparent">
+                Candy Planet
+              </h3>
+              <p className="font-poppins text-background/80">
+                Where sweet dreams come true — creating magical moments one candy at a time.
+              </p>
+            </div>
+
+            {/* Contact */}
+            <div className="space-y-4">
+              <h4 className="font-baloo text-xl font-bold text-primary">Visit Us</h4>
+              <div className="space-y-2 font-poppins text-background/80">
+                <p>18 Rue Rouget de Lisle</p>
+                <p>34200 Sète, France</p>
+                <p>+33 1 23 45 67 89</p>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div className="space-y-4">
+              <h4 className="font-baloo text-xl font-bold text-primary">Quick Links</h4>
+              <div className="space-y-2 font-poppins">
+                <Link to="/about" className="block text-background/80 hover:text-primary transition-colors">
+                  About Us
+                </Link>
+                <Link to="/products" className="block text-background/80 hover:text-primary transition-colors">
+                  Our Products
+                </Link>
+              </div>
+            </div>
+
+            {/* Social */}
+            <div className="space-y-4">
+              <h4 className="font-baloo text-xl font-bold text-primary">Follow Us</h4>
+              <div className="flex space-x-4">
+                <button className="w-10 h-10 bg-gradient-candy rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+                  <Instagram className="w-5 h-5 text-white" />
+                </button>
+                <button className="w-10 h-10 bg-gradient-magical rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+                  <Facebook className="w-5 h-5 text-white" />
+                </button>
+                <button className="w-10 h-10 bg-gradient-sweet rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+                  <span className="text-white font-bold text-sm">TT</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom */}
+          <div className="border-t border-background/20 mt-12 pt-8 text-center">
+            <p className="font-poppins text-background/80 flex items-center justify-center gap-2">
+              © 2024 Candy Planet. All rights reserved.
+              <span className="text-primary">🍭</span>
+            </p>
+          </div>
         </div>
-      </section>
+      </footer>
     </div>
   );
 };
