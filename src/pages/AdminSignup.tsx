@@ -19,17 +19,31 @@ const AdminSignup = () => {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    const params = new URLSearchParams(window.location.search);
+    const returnTo = params.get("returnTo") || "/admin";
+
     const { data, error: signUpError } = await supabase.auth.signUp({ email, password });
-    setLoading(false);
     if (signUpError) {
+      setLoading(false);
       setError(signUpError.message);
       return;
     }
-    if (data.user) {
-      const params = new URLSearchParams(window.location.search);
-      const returnTo = params.get("returnTo") || "/admin";
-      window.location.href = `/login?returnTo=${encodeURIComponent(returnTo)}`;
+
+    // If email confirmations are OFF, Supabase returns a session on signUp.
+    if (data.session) {
+      setLoading(false);
+      window.location.href = returnTo;
+      return;
     }
+
+    // Fallback: if no session yet, try to sign the user in immediately.
+    const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (signInErr || !signInData.session) {
+      setError(signInErr?.message || "Signup succeeded but login failed. Please try signing in.");
+      return;
+    }
+    window.location.href = returnTo;
   };
 
   return (
@@ -56,5 +70,6 @@ const AdminSignup = () => {
 };
 
 export default AdminSignup;
+
 
 

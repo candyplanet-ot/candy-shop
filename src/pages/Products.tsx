@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ShoppingCart, Instagram, Facebook } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,14 +6,61 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/lib/supabaseClient";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/components/ui/use-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const { addItem } = useCart();
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [dbProducts, setDbProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const categories = Array.from(
+    new Set([
+      "All",
+      ...(
+        dbProducts.length > 0
+          ? dbProducts.map((p) => p.category).filter(Boolean)
+          : [
+              "Lollipops",
+              "Chocolates",
+              "Gummies",
+              "Cotton Candy",
+            ]
+      )
+    ])
+  );
 
-  const products = [
+  useEffect(() => {
+    const init = async () => {
+      const { data } = await supabase.auth.getSession();
+      const session = data.session;
+      if (!session) {
+        setIsAdmin(false);
+      } else {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+        setIsAdmin(profile?.role === 'admin');
+      }
+
+      // Load products from DB
+      const { data: prod, error } = await supabase
+        .from('products')
+        .select('id, name, category, price, image, featured, description, stock')
+        .order('id', { ascending: true });
+      if (!error && prod) {
+        setDbProducts(prod);
+      }
+      setLoading(false);
+    };
+    init();
+  }, []);
+
+  const fallbackProducts = [
     {
       id: 1,
       name: "Rainbow Swirl Lollipops",
@@ -97,6 +144,41 @@ const Products = () => {
     },
   ];
 
+  let products = [] as Array<{
+    id: string | number;
+    name: string;
+    category: string;
+    price: string | number;
+    image: string;
+    featured: boolean;
+    description: string;
+    stock?: number;
+  }>;
+
+  if (dbProducts.length > 0) {
+    const db = dbProducts.map((p) => ({
+      id: p.id,
+      name: p.name,
+      category: p.category,
+      price: typeof p.price === 'number' ? `€${p.price.toFixed(2)}` : String(p.price),
+      image: p.image,
+      featured: !!p.featured,
+      description: p.description ?? '',
+      stock: p.stock,
+    }));
+    const dbNames = new Set(db.map((p) => p.name.toLowerCase()));
+    const fallbackTransformed = fallbackProducts
+      .filter((f) => !dbNames.has(f.name.toLowerCase()))
+      .map((f) => ({ ...f, id: `seed-${f.id}` }));
+    products = [...db, ...fallbackTransformed];
+  } else {
+    products = fallbackProducts;
+  }
+
+  const filteredProducts = selectedCategory === "All"
+    ? products
+    : products.filter((p) => p.category === selectedCategory);
+
 
 
   return (
@@ -113,11 +195,32 @@ const Products = () => {
         </div>
       </section>
 
+      {/* Category Filters */}
+      <section className="pt-6">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+            {categories.map((cat) => (
+              <Button
+                key={cat}
+                variant={selectedCategory === cat ? "default" : "outline"}
+                className={selectedCategory === cat ? "bg-gradient-candy text-white border-0" : ""}
+                onClick={() => setSelectedCategory(cat)}
+              >
+                {cat}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Products Grid */}
       <section className="py-20">
         <div className="container mx-auto px-4">
+          {loading && (
+            <div className="mb-6">Loading products...</div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <Card 
                 key={product.id}
                 className={`group hover-tilt hover-bounce transition-all duration-300 overflow-hidden ${
@@ -136,6 +239,9 @@ const Products = () => {
                       src={product.image}
                       alt={product.name}
                       className={`${product.name === "Fruit Explosion Gummies" ? "w-[190px] h-[190px]" : "w-24 h-24"} object-contain group-hover:scale-110 transition-transform duration-300`}
+                      onError={(ev) => {
+                        (ev.currentTarget as HTMLImageElement).src = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240"><rect width="100%" height="100%" fill="#f4f4f5"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#a1a1aa" font-family="Arial" font-size="12">Image not available</text></svg>');
+                      }}
                     />
                   </div>
 
@@ -158,7 +264,9 @@ const Products = () => {
                       variant="default" 
                       className="flex-1 bg-gradient-candy hover:opacity-90 text-white border-0"
                       onClick={() => {
-                        const priceNumber = Number(String(product.price).replace(/[^0-9.]/g, ""));
+                        const priceNumber = typeof product.price === 'string'
+                          ? Number(String(product.price).replace(/[^0-9.]/g, ""))
+                          : Number(product.price);
                         addItem({ id: String(product.id), name: product.name, price: priceNumber, imageUrl: product.image });
                         toast({ title: "Added to cart", description: product.name });
                       }}
@@ -166,6 +274,14 @@ const Products = () => {
                       <ShoppingCart className="w-4 h-4 mr-2" />
                       Add to Cart
                     </Button>
+                    {isAdmin && (
+                      <Button
+                        variant="outline"
+                        onClick={() => navigate('/admin/products')}
+                      >
+                        Edit
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>

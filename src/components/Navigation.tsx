@@ -3,11 +3,14 @@ import { Link, useLocation } from "react-router-dom";
 import { ShoppingCart } from "lucide-react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/lib/supabaseClient";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,6 +20,26 @@ const Navigation = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    const loadRole = async () => {
+      const { data } = await supabase.auth.getSession();
+      const session = data.session;
+      if (!session) {
+        setIsAdmin(false);
+        setIsLoggedIn(false);
+        return;
+      }
+      setIsLoggedIn(true);
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+      setIsAdmin(profile?.role === 'admin');
+    };
+    loadRole();
+  }, [location.pathname]);
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -56,6 +79,30 @@ const Navigation = () => {
                 {item.name}
               </Link>
             ))}
+            {!isLoggedIn && (() => {
+              const current = `${location.pathname}${location.search}${location.hash}`;
+              const loginHref = `/login?returnTo=${encodeURIComponent(current)}`;
+              return (
+                <Link to={loginHref}>
+                  <Button
+                    variant="outline"
+                    className="rounded-xl"
+                  >
+                    Login
+                  </Button>
+                </Link>
+              );
+            })()}
+            {isAdmin && (
+              <Link to="/admin">
+                <Button
+                  variant="outline"
+                  className="rounded-xl border-primary/30 text-primary hover:bg-primary/10"
+                >
+                  Admin
+                </Button>
+              </Link>
+            )}
             <Link to="/cart">
               <Button 
                 variant="default" 
@@ -96,6 +143,30 @@ const Navigation = () => {
                   {item.name}
                 </Link>
               ))}
+              {!isLoggedIn && (() => {
+                const current = `${location.pathname}${location.search}${location.hash}`;
+                const loginHref = `/login?returnTo=${encodeURIComponent(current)}`;
+                return (
+                  <Link to={loginHref} onClick={() => setIsOpen(false)}>
+                    <Button 
+                      variant="outline" 
+                      className="w-full rounded-xl mb-2"
+                    >
+                      Login
+                    </Button>
+                  </Link>
+                );
+              })()}
+              {isAdmin && (
+                <Link to="/admin" onClick={() => setIsOpen(false)}>
+                  <Button 
+                    variant="outline" 
+                    className="w-full rounded-xl border-primary/30 text-primary mb-2"
+                  >
+                    Admin
+                  </Button>
+                </Link>
+              )}
               <Link to="/cart" onClick={() => setIsOpen(false)}>
                 <Button 
                   variant="default" 

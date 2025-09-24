@@ -17,6 +17,7 @@ import { CartProvider } from "./context/CartContext";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Navigation from "./components/Navigation";
+import GalleryAdmin from "./pages/admin/GalleryAdmin";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <CartProvider>
+          <>
           <Navigation />
           <Routes>
           <Route path="/" element={<Index />} />
@@ -60,9 +62,18 @@ const App = () => (
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/gallery"
+            element={
+              <ProtectedRoute>
+                <GalleryAdmin />
+              </ProtectedRoute>
+            }
+          />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
           </Routes>
+          </>
         </CartProvider>
       </BrowserRouter>
     </TooltipProvider>

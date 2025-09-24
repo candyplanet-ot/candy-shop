@@ -43,6 +43,13 @@ const AdminDashboard = () => {
             </Link>
           </div>
           <div className="rounded-lg border p-4">
+            <h2 className="font-bold mb-2">Gallery</h2>
+            <p className="mb-3">Upload, browse, copy URLs, and delete images.</p>
+            <Link to="/admin/gallery">
+              <Button>Open Gallery</Button>
+            </Link>
+          </div>
+          <div className="rounded-lg border p-4">
             <h2 className="font-bold mb-2">Users</h2>
             <p className="mb-3">Assign roles to users (admin/staff/user).</p>
             <Link to="/admin/users">

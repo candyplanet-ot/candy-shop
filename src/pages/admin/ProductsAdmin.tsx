@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabaseClient";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type Product = {
   id: number;
@@ -14,6 +16,7 @@ type Product = {
   image: string;
   featured: boolean;
   description: string;
+  stock: number;
 };
 
 const emptyProduct: Omit<Product, "id"> = {
@@ -23,6 +26,7 @@ const emptyProduct: Omit<Product, "id"> = {
   image: "",
   featured: false,
   description: "",
+  stock: 0,
 };
 
 const ProductsAdmin = () => {
@@ -30,12 +34,76 @@ const ProductsAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(emptyProduct);
+  const [seeding, setSeeding] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryItems, setGalleryItems] = useState<{ path: string; url: string; name: string }[]>([]);
+  const [galleryLoading, setGalleryLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const galleryPrefix = (() => {
+    const d = new Date();
+    return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}`;
+  })();
+  const defaultCategories = ["Lollipops", "Chocolates", "Gummies", "Cotton Candy"];
+  const [categories, setCategories] = useState<string[]>(defaultCategories);
+  const [newCategory, setNewCategory] = useState("");
 
   const loadProducts = async () => {
     setLoading(true);
     const { data, error } = await supabase.from("products").select("*").order("id", { ascending: true });
     if (!error && data) setProducts(data as Product[]);
     setLoading(false);
+
+    // Derive categories from products + defaults
+    if (!error && data) {
+      const fromDb = Array.from(new Set((data as Product[]).map((p) => p.category).filter(Boolean)));
+      const merged = Array.from(new Set([...defaultCategories, ...fromDb]));
+      setCategories(merged);
+    }
+  };
+
+  const openGallery = async () => {
+    setGalleryOpen(true);
+    await refreshGallery();
+  };
+
+  const refreshGallery = async () => {
+    setGalleryLoading(true);
+    const { data, error } = await supabase.storage.from("gallery").list(galleryPrefix, {
+      limit: 100,
+      sortBy: { column: "updated_at", order: "desc" },
+    });
+    if (!error && data) {
+      // Only include file objects (folders don't have metadata/id consistently)
+      const files = (data as any[]).filter((f) => f && f.id && f.metadata);
+      const items = files.map((f: any) => {
+        const fullPath = `${galleryPrefix}/${f.name}`;
+        const { data: pub } = supabase.storage.from("gallery").getPublicUrl(fullPath);
+        return { path: fullPath, url: pub.publicUrl, name: f.name };
+      });
+      setGalleryItems(items);
+    }
+    setGalleryLoading(false);
+  };
+
+  const uploadToGallery = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const date = new Date();
+    const folder = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, "0")}`;
+    const path = `${folder}/${crypto.randomUUID()}-${file.name}`;
+    const { error } = await supabase.storage.from("gallery").upload(path, file, { upsert: false });
+    setUploading(false);
+    if (!error) {
+      await refreshGallery();
+      // Preselect the newly uploaded image into the form
+      const { data: pub } = supabase.storage.from("gallery").getPublicUrl(path);
+      setForm((prev) => ({ ...prev, image: pub.publicUrl }));
+    } else {
+      // eslint-disable-next-line no-alert
+      alert(error.message);
+    }
+    e.target.value = "";
   };
 
   useEffect(() => {
@@ -56,7 +124,13 @@ const ProductsAdmin = () => {
       image: p.image,
       featured: p.featured,
       description: p.description,
+      stock: p.stock,
     });
+
+    // Ensure current product's category exists in the selector
+    if (p.category && !categories.includes(p.category)) {
+      setCategories((prev) => Array.from(new Set([...prev, p.category])));
+    }
   };
 
   const save = async () => {
@@ -75,12 +149,63 @@ const ProductsAdmin = () => {
     await loadProducts();
   };
 
+  const seedDefaults = async () => {
+    setSeeding(true);
+    // A curated set of default products derived from the storefront
+    const defaults: Omit<Product, "id">[] = [
+      {
+        name: "Rainbow Swirl Lollipops",
+        category: "Lollipops",
+        price: 4.99,
+        image: "/product-1.png",
+        featured: true,
+        description: "Handcrafted rainbow lollipops with natural fruit flavors",
+        stock: 100,
+      },
+      {
+        name: "Premium Chocolate Truffles",
+        category: "Chocolates",
+        price: 12.99,
+        image: "/product-2.png",
+        featured: true,
+        description: "Belgian chocolate truffles with exotic fillings",
+        stock: 50,
+      },
+      {
+        name: "Magical Gummy Bears",
+        category: "Gummies",
+        price: 6.99,
+        image: "/product-3.png",
+        featured: false,
+        description: "Soft, chewy gummies in 12 magical flavors",
+        stock: 200,
+      },
+      {
+        name: "Cloud Cotton Candy",
+        category: "Cotton Candy",
+        price: 3.99,
+        image: "/product-4.png",
+        featured: false,
+        description: "Fluffy cotton candy that melts in your mouth",
+        stock: 150,
+      },
+    ];
+    await supabase.from("products").insert(defaults);
+    await loadProducts();
+    setSeeding(false);
+  };
+
   return (
     <div className="pt-16 p-6">
       <div className="container mx-auto grid gap-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-baloo font-bold">Manage Products</h1>
-          <Button onClick={startCreate}>New Product</Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={seedDefaults} disabled={seeding}>
+              {seeding ? "Seeding..." : "Seed default products"}
+            </Button>
+            <Button onClick={startCreate}>New Product</Button>
+          </div>
         </div>
 
         <Card>
@@ -96,6 +221,7 @@ const ProductsAdmin = () => {
                     <div className="font-bold">{p.name}</div>
                     <div className="text-sm text-muted-foreground">{p.category}</div>
                     <div className="text-sm">€{p.price}</div>
+                    <div className="text-sm">In stock: {p.stock}</div>
                     <div className="text-sm line-clamp-2">{p.description}</div>
                     <div className="flex gap-2 pt-2">
                       <Button size="sm" onClick={() => startEdit(p)}>Edit</Button>
@@ -117,15 +243,51 @@ const ProductsAdmin = () => {
               </div>
               <div>
                 <Label>Category</Label>
-                <Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
+                <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="flex gap-2 mt-2">
+                  <Input
+                    placeholder="Add new category"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      const value = newCategory.trim();
+                      if (!value) return;
+                      setCategories((prev) => Array.from(new Set([...prev, value])));
+                      setForm((prev) => ({ ...prev, category: value }));
+                      setNewCategory("");
+                    }}
+                  >
+                    Add
+                  </Button>
+                </div>
               </div>
               <div>
                 <Label>Price (number)</Label>
                 <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} />
               </div>
               <div>
+                <Label>Stock (quantity)</Label>
+                <Input type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: Math.max(0, Number(e.target.value)) })} />
+              </div>
+              <div>
                 <Label>Image URL</Label>
-                <Input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} />
+                <div className="flex gap-2">
+                  <Input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} />
+                  <Button type="button" variant="outline" onClick={openGallery}>Choose from Gallery</Button>
+                </div>
               </div>
               <div className="md:col-span-2">
                 <Label>Description</Label>
@@ -137,6 +299,43 @@ const ProductsAdmin = () => {
             </div>
           </CardContent>
         </Card>
+        <Dialog open={galleryOpen} onOpenChange={setGalleryOpen}>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>Select Image from Gallery</DialogTitle>
+            </DialogHeader>
+            <div className="flex items-center justify-between gap-2 pb-3">
+              <div className="text-sm text-muted-foreground">
+                Choose an existing image or upload a new one.
+              </div>
+              <Input type="file" accept="image/*" onChange={uploadToGallery} disabled={uploading} />
+            </div>
+            {galleryLoading ? (
+              <div>Loading...</div>
+            ) : galleryItems.length === 0 ? (
+              <div className="text-sm text-muted-foreground">No images yet.</div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {galleryItems.map((it) => (
+                  <button
+                    key={it.path}
+                    type="button"
+                    className="border rounded-lg overflow-hidden hover:ring-2 ring-primary"
+                    onClick={() => {
+                      setForm((prev) => ({ ...prev, image: it.url }));
+                      setGalleryOpen(false);
+                    }}
+                  >
+                    <div className="aspect-square bg-muted">
+                      <img src={it.url} alt={it.name} className="object-cover w-full h-full" />
+                    </div>
+                    <div className="text-xs p-2 truncate" title={it.name}>{it.name}</div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
