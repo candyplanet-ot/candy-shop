@@ -45,6 +45,23 @@ const AdminSignup = () => {
         throw signUpError;
       }
 
+      // Update profile role to admin (trigger creates the profile with default role)
+      if (data.user) {
+        console.log("Updating profile role to admin for user:", data.user.id);
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({ role: 'admin' })
+          .eq('id', data.user.id);
+
+        if (profileError) {
+          console.error("Profile update error:", profileError);
+          // Don't throw - profile was created by trigger, just log the role update failure
+          console.warn("Role update failed, but signup succeeded. Manual role assignment may be needed.");
+        } else {
+          console.log("Profile role updated to admin successfully");
+        }
+      }
+
       // If email confirmations are OFF, user gets a session immediately
       if (data.session) {
         console.log("Signup successful with immediate session");
