@@ -22,28 +22,67 @@ const AdminSignup = () => {
     const params = new URLSearchParams(window.location.search);
     const returnTo = params.get("returnTo") || "/admin";
 
-    const { data, error: signUpError } = await supabase.auth.signUp({ email, password });
-    if (signUpError) {
-      setLoading(false);
-      setError(signUpError.message);
-      return;
-    }
+    try {
+      console.log("Starting signup process...");
+      console.log("Email:", email);
+      console.log("Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
 
-    // If email confirmations are OFF, Supabase returns a session on signUp.
-    if (data.session) {
-      setLoading(false);
+      // Sign up with proper options
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/login`,
+          data: {
+            created_at: new Date().toISOString(),
+          }
+        }
+      });
+
+      console.log("Signup response:", { data, error: signUpError });
+
+      if (signUpError) {
+        throw signUpError;
+      }
+
+      // If email confirmations are OFF, user gets a session immediately
+      if (data.session) {
+        console.log("Signup successful with immediate session");
+        setLoading(false);
+        window.location.href = returnTo;
+        return;
+      }
+
+      // If email confirmations are ON, user needs to confirm email
+      if (data.user && !data.session) {
+        console.log("Signup successful, email confirmation required");
+        setLoading(false);
+        alert("Please check your email and click the confirmation link to complete your registration.");
+        window.location.href = "/login";
+        return;
+      }
+
+      // Fallback: try to sign in (for edge cases)
+      console.log("Attempting fallback sign in...");
+      const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      console.log("Sign in response:", { data: signInData, error: signInErr });
+
+      if (signInErr || !signInData.session) {
+        throw new Error(signInErr?.message || "Signup succeeded but login failed. Please try signing in manually.");
+      }
+
       window.location.href = returnTo;
-      return;
-    }
 
-    // Fallback: if no session yet, try to sign the user in immediately.
-    const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (signInErr || !signInData.session) {
-      setError(signInErr?.message || "Signup succeeded but login failed. Please try signing in.");
-      return;
+    } catch (err) {
+      console.error("Signup error:", err);
+      setError(err.message || "Failed to create account. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    window.location.href = returnTo;
   };
 
   return (

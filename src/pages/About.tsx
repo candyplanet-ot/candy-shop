@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 const About = () => {
+  // No special background logic needed; we use the exterior image with gradient overlay
   const teamMembers = [
     {
       name: "Marie Dupont",
@@ -25,13 +26,13 @@ const About = () => {
   const values = [
     {
       icon: Heart,
-      title: "Handmade with Love",
-      description: "Every candy is crafted with passion and care by our skilled artisans",
+      title: "Expensive Experience",
+      description: "Unique Exclusive Experience — Discover rare treats and flavors unavailable anywhere else in your region",
     },
     {
       icon: Award,
-      title: "Premium Ingredients",
-      description: "We source only the finest ingredients from around the world",
+      title: "Global Discoveries",
+      description: "Curated specialties sourced from across the globe",
     },
     {
       icon: Sparkles,
@@ -71,13 +72,16 @@ const About = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
               <h2 className="text-4xl md:text-5xl font-baloo font-bold bg-gradient-candy bg-clip-text text-transparent">
-                Born from a Dream
+                Née d'un Réseau Mondial
               </h2>
               <p className="text-lg font-poppins text-muted-foreground leading-relaxed">
-                In 2010, our founders Marie and Pierre shared a simple dream: to bring back the magic of childhood through handcrafted candies. What started as a small workshop in Sète has grown into a beloved destination where every sweet creation tells a story.
+                Il y a seulement trois mois, notre fondateur avait une vision simple mais puissante : partager la joie unique que les spécialités internationales apportaient à sa famille avec tous ceux qui l'entourent. Grâce à des connexions tissées aux quatre coins du globe, Candy Planet a vu le jour au cœur de Sète.
               </p>
               <p className="text-lg font-poppins text-muted-foreground leading-relaxed">
-                We believe that candy isn't just a treat—it's a moment of pure joy, a spark of wonder, and a bridge to cherished memories. Every day, we pour our hearts into creating confections that don't just taste incredible, but transport you to a world of sweetness and magic.
+                Ce qui nous rend spéciaux, ce n'est pas seulement notre incroyable sélection de confiseries, boissons et gourmandises du monde entier, c'est que chaque produit offre quelque chose d'authentiquement unique. Des saveurs et des expériences que vous ne trouverez tout simplement nulle part ailleurs.
+              </p>
+              <p className="text-lg font-poppins text-muted-foreground leading-relaxed">
+                Ce qui a commencé par le partage de cette joie au sein de notre communauté sétoise s'étend aujourd'hui bien au-delà des frontières. Avec notre site internet, nous pouvons désormais livrer ces découvertes extraordinaires aux explorateurs culinaires du monde entier.
               </p>
             </div>
             <div className="relative">
@@ -88,7 +92,7 @@ const About = () => {
                   <div className="text-4xl font-baloo font-bold text-accent mb-2">50,000+</div>
                   <div className="text-sm font-poppins text-muted-foreground mb-4">Happy Customers</div>
                   <div className="text-4xl font-baloo font-bold text-candy-mint mb-2">100+</div>
-                  <div className="text-sm font-poppins text-muted-foreground">Unique Recipes</div>
+                  
                 </div>
               </div>
             </div>
@@ -104,7 +108,7 @@ const About = () => {
               Why Choose Candy Planet?
             </h2>
             <p className="text-xl font-poppins text-muted-foreground max-w-2xl mx-auto">
-              Our commitment to excellence in every aspect of candy making
+              Our commitment to Provide the best quality products to our customers
             </p>
           </div>
           
@@ -131,43 +135,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section className="py-20 bg-gradient-to-b from-background to-secondary/20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-baloo font-bold bg-gradient-magical bg-clip-text text-transparent mb-6">
-              Meet Our Sweet Team
-            </h2>
-            <p className="text-xl font-poppins text-muted-foreground max-w-2xl mx-auto">
-              The passionate artisans behind every magical creation
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {teamMembers.map((member, index) => (
-              <Card 
-                key={index}
-                className="hover-tilt hover-bounce transition-all duration-300 overflow-hidden"
-              >
-                <CardContent className="p-8 text-center">
-                  <div className="w-24 h-24 mx-auto mb-6 bg-gradient-sweet rounded-full flex items-center justify-center">
-                    <Users className="w-12 h-12 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-baloo font-bold mb-2 text-foreground">
-                    {member.name}
-                  </h3>
-                  <p className="text-primary font-poppins font-semibold mb-4">
-                    {member.role}
-                  </p>
-                  <p className="font-poppins text-muted-foreground">
-                    {member.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      
 
       {/* Mission Statement */}
       <section className="py-20 relative overflow-hidden">

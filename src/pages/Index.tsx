@@ -1,7 +1,6 @@
 import { ArrowRight, Heart, Award, Sparkles, Users, ChevronLeft, ChevronRight, Instagram, Facebook } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import heroImage from "@/assets/hero-candy-land.jpg";
 import featuredCandies from "@/assets/featured-candies.jpg";
 import { useState, Suspense, useMemo } from "react";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
@@ -40,6 +39,25 @@ function CandyModel(props: { mobile?: boolean }) {
 }
 
 const Index = () => {
+  // Tiled SVG background pattern featuring categories (candy, chips, chocolate, noodles, drinks, energy)
+  const heroPatternSvg = `
+    <svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'>
+      <rect width='100%' height='100%' fill='white'/>
+      <g font-family='Segoe UI Emoji, Apple Color Emoji, Noto Color Emoji' font-size='48' opacity='0.12'>
+        <text x='40' y='70'>🍫</text>
+        <text x='180' y='100'>🍭</text>
+        <text x='320' y='60'>🍪</text>
+        <text x='70' y='190'>🍜</text>
+        <text x='240' y='220'>🥤</text>
+        <text x='320' y='180'>⚡️</text>
+        <text x='30' y='330'>🍬</text>
+        <text x='180' y='320'>🥤</text>
+        <text x='290' y='300'>🍫</text>
+      </g>
+    </svg>`;
+  const heroPatternUrl = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(heroPatternSvg)}`;
+  const defaultHeroImage = "/wmremove-transformed.jpeg"; // served from public/
+  const homeHeroBg = (import.meta as any).env?.VITE_HOME_HERO_BG_URL || defaultHeroImage || heroPatternUrl;
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const featuredProducts = [
@@ -106,8 +124,13 @@ const Index = () => {
       <section className="relative min-h-screen overflow-hidden flex items-center">
         {/* Parallax background */}
         <div 
-          className="absolute inset-0 bg-cover bg-center scale-110"
-          style={{ backgroundImage: `url(${heroImage})` }}
+          className="absolute inset-0 scale-110"
+          style={{
+            backgroundImage: `url(${homeHeroBg})`,
+            backgroundSize: homeHeroBg === heroPatternUrl ? '400px 400px' : 'cover',
+            backgroundRepeat: homeHeroBg === heroPatternUrl ? 'repeat' : 'no-repeat',
+            backgroundPosition: 'center'
+          }}
         />
         <div className="absolute inset-0 bg-gradient-hero opacity-70" />
 
@@ -218,7 +241,7 @@ const Index = () => {
               Featured Magical Treats
             </h2>
             <p className="text-xl font-poppins text-muted-foreground max-w-2xl mx-auto">
-              Discover our most beloved creations, handcrafted with love and magic
+              Discover the taste of magic with our featured treats
             </p>
           </div>
 
