@@ -90,13 +90,13 @@ const Index = () => {
   const whyChooseUs = [
     {
       icon: Heart,
-      title: "Handmade with Love",
-      description: "Every candy is crafted with passion and care by our skilled artisans"
+      title: "Expensive Experience",
+      description: "Unique Exclusive Experience — Discover rare treats and flavors unavailable anywhere else in your region"
     },
     {
       icon: Award,
-      title: "Premium Ingredients", 
-      description: "We source only the finest ingredients from around the world"
+      title: "Global Discoveries",
+      description: "Curated specialties sourced from across the globe"
     },
     {
       icon: Sparkles,
@@ -189,7 +189,7 @@ const Index = () => {
               Welcome to <span className="bg-gradient-to-r from-pink-400 via-purple-500 to-pink-600 bg-clip-text text-transparent">Candy</span> Planet
             </h1>
             <p className="text-xl md:text-2xl font-poppins mb-8 animate-fade-in text-white/90 max-w-2xl mx-auto">
-              Handcrafted treats made to delight every moment.
+              Different magical treats arranged to delight your every moment.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
