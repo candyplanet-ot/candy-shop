@@ -149,6 +149,32 @@ const ProductsAdmin = () => {
     await loadProducts();
   };
 
+  const deleteCategory = async (categoryToDelete: string) => {
+    if (!confirm(`Delete category "${categoryToDelete}"? This will clear the category for all products using it.`)) return;
+
+    // Update DB: set category = '' for all products with this category
+    const { error: updateError } = await supabase
+      .from("products")
+      .update({ category: '' })
+      .eq("category", categoryToDelete);
+
+    if (updateError) {
+      alert(`Error updating products: ${updateError.message}`);
+      return;
+    }
+
+    // Update local categories temporarily
+    setCategories((prev) => prev.filter((c) => c !== categoryToDelete));
+
+    // Reset form if it was using this category
+    if (form.category === categoryToDelete) {
+      setForm((prev) => ({ ...prev, category: '' }));
+    }
+
+    // Reload products to reflect changes and refresh categories
+    await loadProducts();
+  };
+
   const seedDefaults = async () => {
     setSeeding(true);
     // A curated set of default products derived from the storefront
@@ -272,6 +298,21 @@ const ProductsAdmin = () => {
                   >
                     Add
                   </Button>
+                </div>
+                <div className="mt-2 space-y-1 max-h-32 overflow-y-auto border rounded p-2 bg-muted/50">
+                  {categories.map((c) => (
+                    <div key={c} className="flex items-center justify-between text-sm">
+                      <span className="flex-1 truncate">{c}</span>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => deleteCategory(c)}
+                        className="ml-2"
+                      >
+                        Delete
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               </div>
               <div>
