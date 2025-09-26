@@ -1,4 +1,4 @@
-import { ArrowRight, Heart, Award, Sparkles, Users, ChevronLeft, ChevronRight, Instagram, Facebook } from "lucide-react";
+import { ArrowRight, Heart, Award, Sparkles, Users, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import featuredCandies from "@/assets/featured-candies.jpg";
@@ -316,7 +316,7 @@ const Index = () => {
               Why Choose Candy Planet?
             </h2>
             <p className="text-xl font-poppins text-muted-foreground max-w-2xl mx-auto">
-              Our commitment to excellence in every aspect of candy making
+              Our commitment to excellence in every aspect of quality, taste, and customer joy
             </p>
           </div>
 
@@ -354,10 +354,10 @@ const Index = () => {
         </div>
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h2 className="text-4xl md:text-6xl font-baloo font-bold text-white mb-6">
-            Ready for a Sweet Adventure?
+            Ready for a Treat Adventure?
           </h2>
           <p className="text-xl md:text-2xl font-poppins text-white/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of happy customers who have discovered the magic of our handcrafted candies
+            Join thousands of happy customers who have discovered the magic of Candy Planet
           </p>
           <Link to="/products">
             <Button variant="sweet" size="lg" className="shine-border hover-bounce text-lg px-12">
@@ -369,69 +369,6 @@ const Index = () => {
         <div className="absolute bottom-0 left-0 right-0 h-8 candy-stripe" />
       </section>
 
-      {/* Footer */}
-      <footer className="bg-foreground text-background py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Brand */}
-            <div className="space-y-4">
-              <h3 className="font-fredoka text-3xl font-bold bg-gradient-candy bg-clip-text text-transparent">
-                Candy Planet
-              </h3>
-              <p className="font-poppins text-background/80">
-                Where sweet dreams come true — creating magical moments one candy at a time.
-              </p>
-            </div>
-
-            {/* Contact */}
-            <div className="space-y-4">
-              <h4 className="font-baloo text-xl font-bold text-primary">Visit Us</h4>
-              <div className="space-y-2 font-poppins text-background/80">
-                <p>18 Rue Rouget de Lisle</p>
-                <p>34200 Sète, France</p>
-                <p>+33 1 23 45 67 89</p>
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div className="space-y-4">
-              <h4 className="font-baloo text-xl font-bold text-primary">Quick Links</h4>
-              <div className="space-y-2 font-poppins">
-                <Link to="/about" className="block text-background/80 hover:text-primary transition-colors">
-                  About Us
-                </Link>
-                <Link to="/products" className="block text-background/80 hover:text-primary transition-colors">
-                  Our Products
-                </Link>
-              </div>
-            </div>
-
-            {/* Social */}
-            <div className="space-y-4">
-              <h4 className="font-baloo text-xl font-bold text-primary">Follow Us</h4>
-              <div className="flex space-x-4">
-                <button className="w-10 h-10 bg-gradient-candy rounded-full flex items-center justify-center hover:scale-110 transition-transform">
-                  <Instagram className="w-5 h-5 text-white" />
-                </button>
-                <button className="w-10 h-10 bg-gradient-magical rounded-full flex items-center justify-center hover:scale-110 transition-transform">
-                  <Facebook className="w-5 h-5 text-white" />
-                </button>
-                <button className="w-10 h-10 bg-gradient-sweet rounded-full flex items-center justify-center hover:scale-110 transition-transform">
-                  <span className="text-white font-bold text-sm">TT</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom */}
-          <div className="border-t border-background/20 mt-12 pt-8 text-center">
-            <p className="font-poppins text-background/80 flex items-center justify-center gap-2">
-              © 2024 Candy Planet. All rights reserved.
-              <span className="text-primary">🍭</span>
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

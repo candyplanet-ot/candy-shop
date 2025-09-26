@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ShoppingCart, Instagram, Facebook } from "lucide-react";
+import { ShoppingCart, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -175,9 +175,11 @@ const Products = () => {
     products = fallbackProducts;
   }
 
+  const uniqueProducts = Array.from(new Map(products.map(p => [p.name.toLowerCase(), p])).values());
+
   const filteredProducts = selectedCategory === "All"
-    ? products
-    : products.filter((p) => p.category === selectedCategory);
+    ? uniqueProducts
+    : uniqueProducts.filter((p) => p.category === selectedCategory);
 
 
 
@@ -290,69 +292,6 @@ const Products = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-foreground text-background py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Brand */}
-            <div className="space-y-4">
-              <h3 className="font-fredoka text-3xl font-bold bg-gradient-candy bg-clip-text text-transparent">
-                Candy Planet
-              </h3>
-              <p className="font-poppins text-background/80">
-                Where sweet dreams come true — creating magical moments one candy at a time.
-              </p>
-            </div>
-
-            {/* Contact */}
-            <div className="space-y-4">
-              <h4 className="font-baloo text-xl font-bold text-primary">Visit Us</h4>
-              <div className="space-y-2 font-poppins text-background/80">
-                <p>18 Rue Rouget de Lisle</p>
-                <p>34200 Sète, France</p>
-                <p>+33 1 23 45 67 89</p>
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div className="space-y-4">
-              <h4 className="font-baloo text-xl font-bold text-primary">Quick Links</h4>
-              <div className="space-y-2 font-poppins">
-                <Link to="/about" className="block text-background/80 hover:text-primary transition-colors">
-                  About Us
-                </Link>
-                <Link to="/products" className="block text-background/80 hover:text-primary transition-colors">
-                  Our Products
-                </Link>
-              </div>
-            </div>
-
-            {/* Social */}
-            <div className="space-y-4">
-              <h4 className="font-baloo text-xl font-bold text-primary">Follow Us</h4>
-              <div className="flex space-x-4">
-                <button className="w-10 h-10 bg-gradient-candy rounded-full flex items-center justify-center hover:scale-110 transition-transform">
-                  <Instagram className="w-5 h-5 text-white" />
-                </button>
-                <button className="w-10 h-10 bg-gradient-magical rounded-full flex items-center justify-center hover:scale-110 transition-transform">
-                  <Facebook className="w-5 h-5 text-white" />
-                </button>
-                <button className="w-10 h-10 bg-gradient-sweet rounded-full flex items-center justify-center hover:scale-110 transition-transform">
-                  <span className="text-white font-bold text-sm">TT</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom */}
-          <div className="border-t border-background/20 mt-12 pt-8 text-center">
-            <p className="font-poppins text-background/80 flex items-center justify-center gap-2">
-              © 2024 Candy Planet. All rights reserved.
-              <span className="text-primary">🍭</span>
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

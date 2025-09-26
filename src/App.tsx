@@ -18,6 +18,7 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import Navigation from "./components/Navigation";
 import GalleryAdmin from "./pages/admin/GalleryAdmin";
+import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +74,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
           </Routes>
+          <Footer />
           </>
         </CartProvider>
       </BrowserRouter>

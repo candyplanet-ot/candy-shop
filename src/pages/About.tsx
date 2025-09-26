@@ -1,5 +1,5 @@
 import { Heart, Users, Award, Sparkles } from "lucide-react";
-import candyShopExterior from "@/assets/candy-shop-exterior.jpg";
+import shopImg from "@/assets/shop-img.jpg";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -52,7 +52,7 @@ const About = () => {
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${candyShopExterior})` }}
+          style={{ backgroundImage: `url(${shopImg})` }}
         />
         <div className="absolute inset-0 bg-gradient-hero opacity-80" />
         <div className="relative z-10 text-center text-white px-4">
@@ -60,7 +60,7 @@ const About = () => {
             Our Sweet Story
           </h1>
           <p className="text-xl md:text-2xl font-poppins max-w-2xl mx-auto animate-fade-in">
-            Where passion meets craftsmanship in every magical bite
+            Where passion meets Adventure in every treat
           </p>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-24 candy-stripe" />
