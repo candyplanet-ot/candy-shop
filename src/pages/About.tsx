@@ -146,7 +146,7 @@ const About = () => {
               Our Mission
             </h2>
             <p className="text-2xl font-poppins text-foreground leading-relaxed mb-8">
-              "To create moments of pure magic through handcrafted candies that bring joy, wonder, and sweetness to every life we touch."
+              "Our goal is to get you to taste food from all around the world , just from your bed , one click and you have travelled the world."
             </p>
             <div className="h-2 w-32 bg-gradient-candy mx-auto rounded-full mb-8" />
             <Button variant="hero" size="lg" className="shine-border hover-bounce">

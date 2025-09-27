@@ -12,6 +12,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const [form, setForm] = useState({
     fullName: "",
@@ -28,11 +29,6 @@ const Checkout = () => {
     setError(null);
     setLoading(true);
     const { data } = await supabase.auth.getSession();
-    if (!data.session) {
-      const returnTo = encodeURIComponent("/checkout");
-      window.location.href = `/login?returnTo=${returnTo}`;
-      return;
-    }
     if (items.length === 0) {
       setError("Your cart is empty");
       setLoading(false);
@@ -42,7 +38,7 @@ const Checkout = () => {
     // Insert order (address currently not persisted in schema)
     const { data: order, error: orderErr } = await supabase
       .from("orders")
-      .insert({ user_id: data.session.user.id, status: "pending" })
+      .insert({ user_id: data.session?.user.id || null, status: "pending" })
       .select("id")
       .single();
     if (orderErr || !order) {
@@ -61,9 +57,24 @@ const Checkout = () => {
 
     clear();
     setLoading(false);
-    navigate("/cart", { replace: true });
-    alert("Order placed! We'll process it shortly.");
+    setSuccess(true);
   };
+
+  if (success) {
+    return (
+      <div className="pt-16 p-6 container mx-auto max-w-3xl">
+        <Card>
+          <CardContent className="p-6 text-center space-y-4">
+            <h2 className="text-2xl font-bold text-green-600">Thanks for ordering!</h2>
+            <p className="text-lg">We hope to see you again soon.</p>
+            <Button onClick={() => navigate("/")} className="w-full max-w-xs mx-auto">
+              Return to Home
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-16 p-6">

@@ -60,7 +60,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="border-t border-background/20 mt-12 pt-8 text-center">
           <p className="font-poppins text-background/80 flex items-center justify-center gap-2">
-            © 2024 Candy Planet. All rights reserved.
+            © 2025 Candy Planet. All rights reserved.
             <span className="text-primary">🍭</span>
           </p>
         </div>

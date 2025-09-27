@@ -192,7 +192,7 @@ const Products = () => {
             Our Magical Collection
           </h1>
           <p className="text-xl md:text-2xl font-poppins text-muted-foreground max-w-2xl mx-auto animate-fade-in">
-            Discover handcrafted candies that bring joy to every moment
+            Discover different treats that bring joy to every moment
           </p>
         </div>
       </section>

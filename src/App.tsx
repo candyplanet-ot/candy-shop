@@ -19,6 +19,7 @@ import Checkout from "./pages/Checkout";
 import Navigation from "./components/Navigation";
 import GalleryAdmin from "./pages/admin/GalleryAdmin";
 import Footer from "./components/Footer";
+import SEOHead from "./components/SEOHead";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <SEOHead />
         <CartProvider>
           <>
           <Navigation />
