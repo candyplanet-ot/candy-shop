@@ -1,11 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL || '',
-  process.env.SUPABASE_ANON_KEY || ''
-);
-
 // CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,35 +15,9 @@ function handleOptions() {
   });
 }
 
-// Get SumUp access token
-async function getAccessToken() {
-  try {
-    const response = await fetch('https://api.sandbox.sumup.com/token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        grant_type: 'client_credentials',
-        client_id: process.env.SUMUP_CLIENT_ID || 'your_test_client_id',
-        client_secret: process.env.SUMUP_CLIENT_SECRET || 'your_test_client_secret',
-      }),
-    });
+// Using pre-generated SumUp sandbox token via Cloudflare binding (env.SUMUP_SANDBOX_TOKEN)
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`SumUp token error: ${error}`);
-    }
-
-    const data = await response.json();
-    return data.access_token;
-  } catch (error) {
-    console.error('Error getting access token:', error);
-    throw error;
-  }
-}
-
-export async function onRequestPost({ request }: { request: Request }) {
+export async function onRequestPost({ request, env }: { request: Request, env: any }) {
   // Handle CORS preflight
   if (request.method === 'OPTIONS') {
     return handleOptions();
@@ -68,7 +36,7 @@ export async function onRequestPost({ request }: { request: Request }) {
 
     // For testing, use dummy data if Supabase is not configured
     let order;
-    if (!process.env.SUPABASE_URL) {
+    if (!env.SUPABASE_URL) {
       console.log('Using test order data (Supabase not configured)');
       order = {
         id: orderId,
@@ -77,6 +45,9 @@ export async function onRequestPost({ request }: { request: Request }) {
         items: [{ name: 'Test Item', quantity: 1, price: 10.99 }]
       };
     } else {
+      // Initialize Supabase client with Cloudflare bindings
+      const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+
       // Fetch order from Supabase
       console.log('Fetching order from Supabase');
       const { data, error } = await supabase
@@ -95,14 +66,15 @@ export async function onRequestPost({ request }: { request: Request }) {
       order = data;
     }
 
-    // Get SumUp access token
-    console.log('Getting SumUp access token');
-    const accessToken = await getAccessToken();
-    const merchantCode = process.env.SUMUP_MERCHANT_CODE || 'your_test_merchant_code';
+    // Use pre-generated SumUp sandbox token from environment
+    const accessToken = env.SUMUP_SANDBOX_TOKEN;
+    if (!accessToken) {
+      throw new Error('SUMUP_SANDBOX_TOKEN is not configured');
+    }
+    const merchantCode = env.SUMUP_MERCHANT_CODE || 'your_test_merchant_code';
     const checkoutBaseUrl = 'https://api.sandbox.sumup.com/v0.1/checkouts';
 
     // Create checkout session
-    console.log('Creating SumUp checkout');
     const sumupResponse = await fetch(checkoutBaseUrl, {
       method: 'POST',
       headers: {
