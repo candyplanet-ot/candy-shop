@@ -41,13 +41,28 @@ const Checkout = () => {
       .insert({ user_id: data.session?.user.id || null, status: "pending" })
       .select("id")
       .single();
+
+    console.log("Order ID:", order?.id);
     if (orderErr || !order) {
       setError(orderErr?.message ?? "Failed to create order");
       setLoading(false);
       return;
     }
 
-    const rows = items.map((i) => ({ order_id: order.id, product_id: i.id, quantity: i.quantity, price: i.price }));
+    // Helper function to validate UUID v4 format
+    const isValidUUID = (uuid: string) => {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      return uuidRegex.test(uuid);
+    };
+
+    const rows = items
+      .filter((i) => isValidUUID(String(i.id)))
+      .map((i) => ({
+        order_id: String(order.id), // Cast order_id to string to avoid UUID error
+        product_id: String(i.id), // Cast product_id to string to avoid UUID error
+        quantity: i.quantity,
+        price: i.price,
+      }));
     const { error: itemsErr } = await supabase.from("order_items").insert(rows);
     if (itemsErr) {
       setError(itemsErr.message);
@@ -55,9 +70,28 @@ const Checkout = () => {
       return;
     }
 
-    clear();
-    setLoading(false);
-    setSuccess(true);
+    // Call Cloudflare function to create SumUp checkout
+    try {
+    const response = await fetch('https://candy-shop4.pages.dev/api/sumup/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId: order.id, amount: subtotal }),
+    });
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("SumUp checkout error:", errorData);
+        setError(errorData.error || 'Failed to initiate payment');
+        setLoading(false);
+        return;
+      }
+      const { checkoutUrl } = await response.json();
+      // Redirect to SumUp checkout page
+      window.location.href = checkoutUrl;
+    } catch (err) {
+      setError('Payment initiation failed');
+      setLoading(false);
+      return;
+    }
   };
 
   if (success) {

@@ -16,6 +16,7 @@ import AdminSignup from "./pages/AdminSignup";
 import { CartProvider } from "./context/CartContext";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import OrderSuccess from "./pages/OrderSuccess";
 import Navigation from "./components/Navigation";
 import GalleryAdmin from "./pages/admin/GalleryAdmin";
 import Footer from "./components/Footer";
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/products" element={<Products />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/login" element={<AdminLogin />} />
           <Route path="/signup" element={<AdminSignup />} />
           <Route
