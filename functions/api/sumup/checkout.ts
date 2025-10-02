@@ -1,7 +1,3 @@
-import { Router } from 'itty-router';
-
-const router = Router();
-
 // Configuration
 const SUMUP_CLIENT_ID = process.env.SUMUP_CLIENT_ID || '';
 const SUMUP_CLIENT_SECRET = process.env.SUMUP_CLIENT_SECRET || '';
@@ -10,8 +6,7 @@ const SUMUP_CLIENT_SECRET = process.env.SUMUP_CLIENT_SECRET || '';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-};
+  'Access-Control-Allow-Headers': 'Content-Type',};
 
 // Helper function to get access token from SumUp
 async function getAccessToken() {
@@ -39,15 +34,28 @@ async function getAccessToken() {
 }
 
 // Handle CORS preflight
-router.options('/', () => {
+function handleOptions() {
   return new Response(null, {
     status: 200,
     headers: corsHeaders,
   });
-});
+}
 
-// Handle checkout creation
-router.post('/', async (request: Request) => {
+// Main request handler
+export async function onRequest({ request }: { request: Request }) {
+  // Handle CORS preflight
+  if (request.method === 'OPTIONS') {
+    return handleOptions();
+  }
+
+  // Only allow POST requests
+  if (request.method !== 'POST') {
+    return new Response(
+      JSON.stringify({ error: 'Method not allowed' }),
+      { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
   try {
     // Parse and validate request
     const body = await request.json();
@@ -68,7 +76,7 @@ router.post('/', async (request: Request) => {
 
     // Get SumUp API credentials
     const accessToken = await getAccessToken();
-    const apiEndpoint = 'https://api.sumup.com/v0.1/checkouts';
+    const checkoutBaseUrl = 'https://api.sumup.com/v0.1/checkouts';
     const merchantCode = process.env.SUMUP_MERCHANT_CODE || '';
 
     if (!merchantCode) {
@@ -76,7 +84,7 @@ router.post('/', async (request: Request) => {
     }
 
     // Create checkout session
-    const checkoutResponse = await fetch(apiEndpoint, {
+    const checkoutResponse = await fetch(checkoutBaseUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -114,10 +122,10 @@ router.post('/', async (request: Request) => {
 
     // Return checkout URL to client
     const { id } = await checkoutResponse.json();
-    const redirectUrl = `https://checkout.sumup.com/pay/${id}`;
+    const checkoutPaymentUrl = `https://checkout.sumup.com/pay/${id}`;
 
     return new Response(
-      JSON.stringify({ checkoutUrl: redirectUrl }), 
+      JSON.stringify({ checkoutUrl: checkoutPaymentUrl }), 
       {
         status: 200,
         headers: {
@@ -145,6 +153,7 @@ router.post('/', async (request: Request) => {
       }
     );
   }
-});
+}
 
-export default router;
+// For backward compatibility
+export const onRequestPost = onRequest;
