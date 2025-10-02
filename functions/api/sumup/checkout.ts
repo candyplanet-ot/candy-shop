@@ -48,6 +48,7 @@ const corsHeaders = {
 };
 
 router.post('/', async (request: Request) => {
+  try {
     const body = await request.json();
     const { orderId, amount } = body;
 
@@ -62,10 +63,10 @@ router.post('/', async (request: Request) => {
     }
 
     const accessToken = await getAccessToken();
-    const checkoutUrl = 'https://api.sumup.com/v0.1/checkouts';
+    const apiUrl = 'https://api.sumup.com/v0.1/checkouts';
     const merchantCode = process.env.SUMUP_MERCHANT_CODE;
 
-    const checkoutResponse = await fetch(checkoutUrl, {
+    const checkoutResponse = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -95,18 +96,18 @@ router.post('/', async (request: Request) => {
     }
 
     const { id } = await checkoutResponse.json();
-    const checkoutUrl = `https://checkout.sumup.com/pay/${id}`;
+    const paymentUrl = `https://checkout.sumup.com/pay/${id}`;
 
-    return new Response(JSON.stringify({ checkoutUrl }), {
+    return new Response(JSON.stringify({ checkoutUrl: paymentUrl }), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
         ...corsHeaders
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error:', error);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+    return new Response(JSON.stringify({ error: error.message || 'Internal server error' }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json',
@@ -114,4 +115,4 @@ router.post('/', async (request: Request) => {
       },
     });
   }
-};
+});
