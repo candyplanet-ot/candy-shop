@@ -41,61 +41,77 @@ router.options('/', () => {
   });
 });
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
 router.post('/', async (request: Request) => {
-  try {
     const body = await request.json();
     const { orderId, amount } = body;
 
     if (!orderId || !amount) {
       return new Response(JSON.stringify({ error: 'Missing orderId or amount' }), {
         status: 400,
-        headers: { 'Access-Control-Allow-Origin': '*' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders
+        },
       });
     }
 
     const accessToken = await getAccessToken();
+    const checkoutUrl = 'https://api.sumup.com/v0.1/checkouts';
+    const merchantCode = process.env.SUMUP_MERCHANT_CODE;
 
-    const checkoutResponse = await fetch('https://api.sumup.com/v0.1/checkouts', {
+    const checkoutResponse = await fetch(checkoutUrl, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
       },
       body: JSON.stringify({
         checkout_reference: orderId,
-        amount: {
-          amount: amount.toFixed(2),
-          currency: 'EUR',
-        },
-        merchant_code: SUMUP_CLIENT_ID,
-        return_url: 'https://candy-shop4.pages.dev/order-success',
+        amount: amount * 100, // Convert to cents
+        currency: 'EUR',
+        merchant_code: merchantCode,
+        description: `Order #${orderId}`,
+        return_url: `${new URL(request.url).origin}/order-success`,
+        cancel_url: `${new URL(request.url).origin}/cart`,
       }),
     });
 
     if (!checkoutResponse.ok) {
-      const errorData = await checkoutResponse.json();
-      return new Response(JSON.stringify({ error: 'Failed to create checkout', details: errorData }), {
+      const error = await checkoutResponse.text();
+      console.error('SumUp API error:', error);
+      return new Response(JSON.stringify({ error: 'Failed to create checkout' }), {
         status: 500,
-        headers: { 'Access-Control-Allow-Origin': '*' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders
+        },
       });
     }
 
-    const checkoutData = await checkoutResponse.json();
+    const { id } = await checkoutResponse.json();
+    const checkoutUrl = `https://checkout.sumup.com/pay/${id}`;
 
-    return new Response(JSON.stringify({ checkoutUrl: checkoutData.checkout_url }), {
+    return new Response(JSON.stringify({ checkoutUrl }), {
+      status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
+        ...corsHeaders
       },
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: (error as Error).message }), {
+    console.error('Error:', error);
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
-      headers: { 'Access-Control-Allow-Origin': '*' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...corsHeaders
+      },
     });
   }
-});
-
-export default {
-  fetch: router.handle,
 };
