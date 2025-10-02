@@ -1,37 +1,17 @@
-// Configuration
-const SUMUP_CLIENT_ID = process.env.SUMUP_CLIENT_ID || '';
-const SUMUP_CLIENT_SECRET = process.env.SUMUP_CLIENT_SECRET || '';
+import { createClient } from '@supabase/supabase-js';
 
-// CORS headers configuration
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.SUPABASE_URL || '',
+  process.env.SUPABASE_ANON_KEY || ''
+);
+
+// CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',};
-
-// Helper function to get access token from SumUp
-async function getAccessToken() {
-  const tokenUrl = 'https://api.sumup.com/token';
-  const body = new URLSearchParams({
-    grant_type: 'client_credentials',
-    client_id: SUMUP_CLIENT_ID,
-    client_secret: SUMUP_CLIENT_SECRET,
-  });
-
-  const response = await fetch(tokenUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: body.toString(),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to get access token from SumUp');
-  }
-
-  const data = await response.json();
-  return data.access_token;
-}
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
 
 // Handle CORS preflight
 function handleOptions() {
@@ -41,91 +21,121 @@ function handleOptions() {
   });
 }
 
-// Main request handler
-export async function onRequest({ request }: { request: Request }) {
+// Get SumUp access token
+async function getAccessToken() {
+  try {
+    const response = await fetch('https://api.sandbox.sumup.com/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: process.env.SUMUP_CLIENT_ID || 'your_test_client_id',
+        client_secret: process.env.SUMUP_CLIENT_SECRET || 'your_test_client_secret',
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`SumUp token error: ${error}`);
+    }
+
+    const data = await response.json();
+    return data.access_token;
+  } catch (error) {
+    console.error('Error getting access token:', error);
+    throw error;
+  }
+}
+
+export async function onRequestPost({ request }: { request: Request }) {
   // Handle CORS preflight
   if (request.method === 'OPTIONS') {
     return handleOptions();
   }
 
-  // Only allow POST requests
-  if (request.method !== 'POST') {
-    return new Response(
-      JSON.stringify({ error: 'Method not allowed' }),
-      { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-  }
-
   try {
-    // Parse and validate request
-    const body = await request.json();
-    const { orderId, amount } = body;
+    // Parse request body
+    const { orderId } = await request.json();
 
-    if (!orderId || !amount) {
+    if (!orderId) {
       return new Response(
-        JSON.stringify({ error: 'Missing orderId or amount' }), 
-        {
-          status: 400,
-          headers: {
-            'Content-Type': 'application/json',
-            ...corsHeaders,
-          },
-        }
+        JSON.stringify({ error: 'orderId is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Get SumUp API credentials
-    const accessToken = await getAccessToken();
-    const checkoutBaseUrl = 'https://api.sumup.com/v0.1/checkouts';
-    const merchantCode = process.env.SUMUP_MERCHANT_CODE || '';
+    // For testing, use dummy data if Supabase is not configured
+    let order;
+    if (!process.env.SUPABASE_URL) {
+      console.log('Using test order data (Supabase not configured)');
+      order = {
+        id: orderId,
+        total_amount: 10.99, // Test amount
+        currency: 'EUR',
+        items: [{ name: 'Test Item', quantity: 1, price: 10.99 }]
+      };
+    } else {
+      // Fetch order from Supabase
+      console.log('Fetching order from Supabase');
+      const { data, error } = await supabase
+        .from('orders')
+        .select('id, total_amount, currency, items')
+        .eq('id', orderId)
+        .single();
 
-    if (!merchantCode) {
-      throw new Error('Merchant code is not configured');
+      if (error || !data) {
+        console.error('Order not found in Supabase:', error);
+        return new Response(
+          JSON.stringify({ error: 'Order not found' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      order = data;
     }
 
+    // Get SumUp access token
+    console.log('Getting SumUp access token');
+    const accessToken = await getAccessToken();
+    const merchantCode = process.env.SUMUP_MERCHANT_CODE || 'your_test_merchant_code';
+    const checkoutBaseUrl = 'https://api.sandbox.sumup.com/v0.1/checkouts';
+
     // Create checkout session
-    const checkoutResponse = await fetch(checkoutBaseUrl, {
+    console.log('Creating SumUp checkout');
+    const sumupResponse = await fetch(checkoutBaseUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
       },
       body: JSON.stringify({
-        checkout_reference: orderId,
-        amount: Math.round(amount * 100), // Convert to cents
-        currency: 'EUR',
+        checkout_reference: order.id,
+        amount: Math.round(order.total_amount * 100), // Convert to cents
+        currency: order.currency || 'EUR',
         merchant_code: merchantCode,
-        description: `Order #${orderId}`,
+        description: `Order #${order.id}`,
         return_url: `${new URL(request.url).origin}/order-success`,
         cancel_url: `${new URL(request.url).origin}/cart`,
       }),
     });
 
-    // Handle API response
-    if (!checkoutResponse.ok) {
-      const error = await checkoutResponse.text();
-      console.error('SumUp API error:', error);
-      return new Response(
-        JSON.stringify({ 
-          error: 'Failed to create checkout',
-          details: error,
-        }), 
-        {
-          status: checkoutResponse.status,
-          headers: {
-            'Content-Type': 'application/json',
-            ...corsHeaders,
-          },
-        }
-      );
+    const data = await sumupResponse.json();
+
+    if (!sumupResponse.ok) {
+      console.error('SumUp API error:', data);
+      throw new Error(data.message || 'Failed to create SumUp checkout');
     }
 
-    // Return checkout URL to client
-    const { id } = await checkoutResponse.json();
-    const checkoutPaymentUrl = `https://checkout.sumup.com/pay/${id}`;
+    const checkoutPaymentUrl = `https://sandbox.checkout.sumup.com/pay/${data.id}`;
+    console.log('Checkout created successfully:', checkoutPaymentUrl);
 
     return new Response(
-      JSON.stringify({ checkoutUrl: checkoutPaymentUrl }), 
+      JSON.stringify({
+        success: true,
+        redirectUrl: checkoutPaymentUrl,
+        checkoutId: data.id
+      }),
       {
         status: 200,
         headers: {
@@ -134,16 +144,17 @@ export async function onRequest({ request }: { request: Request }) {
         },
       }
     );
+
   } catch (error) {
-    // Handle any unexpected errors
     console.error('Checkout error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-    
+
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
+        success: false,
         error: 'Checkout processing failed',
         details: errorMessage,
-      }), 
+      }),
       {
         status: 500,
         headers: {
@@ -156,4 +167,4 @@ export async function onRequest({ request }: { request: Request }) {
 }
 
 // For backward compatibility
-export const onRequestPost = onRequest;
+export const onRequest = onRequestPost;
