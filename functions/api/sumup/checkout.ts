@@ -75,27 +75,51 @@ export async function onRequestPost({ request, env }: { request: Request, env: a
       throw new Error('SumUp access token is not configured');
     }
     const merchantCode = env.SUMUP_MERCHANT_CODE || 'your_test_merchant_code';
-    const checkoutBaseUrl = 'https://api.sandbox.sumup.com/v0.1/checkouts';
+    const checkoutBaseUrl = 'https://api.sumup.com/v0.1/checkouts';
 
     // Create checkout session
+    const payload = {
+      checkout_reference: order.id,
+      amount: Math.round(order.total_amount * 100), // Convert to cents
+      currency: order.currency || 'EUR',
+      merchant_code: merchantCode,
+      description: `Order #${order.id}`,
+      return_url: `${new URL(request.url).origin}/order-success`,
+      cancel_url: `${new URL(request.url).origin}/cart`,
+    };
+
+    const redactedAuth = `Bearer ${String(accessToken).slice(0, 10)}...redacted`;
+    console.log('SumUp request ->', {
+      url: checkoutBaseUrl,
+      headers: { 'Content-Type': 'application/json', Authorization: redactedAuth },
+      body: payload,
+    });
+
     const sumupResponse = await fetch(checkoutBaseUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({
-        checkout_reference: order.id,
-        amount: Math.round(order.total_amount * 100), // Convert to cents
-        currency: order.currency || 'EUR',
-        merchant_code: merchantCode,
-        description: `Order #${order.id}`,
-        return_url: `${new URL(request.url).origin}/order-success`,
-        cancel_url: `${new URL(request.url).origin}/cart`,
-      }),
+      body: JSON.stringify(payload),
     });
 
-    const data = await sumupResponse.json();
+    // Log full response: status + body
+    const responseClone = sumupResponse.clone();
+    const responseText = await sumupResponse.text();
+    console.log('SumUp response <-', {
+      status: responseClone.status,
+      ok: responseClone.ok,
+      body: responseText,
+    });
+
+    const data = await responseClone.json().catch(() => {
+      try {
+        return JSON.parse(responseText);
+      } catch {
+        return { raw: responseText } as any;
+      }
+    });
 
     if (!sumupResponse.ok) {
       console.error('SumUp API error:', data);
@@ -121,7 +145,7 @@ export async function onRequestPost({ request, env }: { request: Request, env: a
     );
 
   } catch (error) {
-    console.error('Checkout error:', error);
+    console.error('Checkout error (caught):', error);
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
     return new Response(
