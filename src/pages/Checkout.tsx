@@ -84,9 +84,16 @@ const Checkout = () => {
         setLoading(false);
         return;
       }
-      const { checkoutUrl } = await response.json();
-      // Redirect to SumUp checkout page
-      window.location.href = checkoutUrl;
+      const json = await response.json();
+      const redirectUrl = json?.redirectUrl;
+      if (typeof redirectUrl === 'string' && redirectUrl.startsWith('https://sandbox.checkout.sumup.com/pay/')) {
+        window.location.assign(redirectUrl);
+      } else {
+        console.error('Missing or invalid redirectUrl in response', json);
+        setError('Failed to initiate payment');
+        setLoading(false);
+        return;
+      }
     } catch (err) {
       setError('Payment initiation failed');
       setLoading(false);
