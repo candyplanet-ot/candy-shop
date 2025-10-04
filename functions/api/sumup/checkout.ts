@@ -72,6 +72,10 @@ export async function onRequestPost({ request, env }: { request: Request, env: a
       throw new Error('SUMUP_SANDBOX_TOKEN is not configured');
     }
     const merchantCode = env.SUMUP_MERCHANT_CODE || 'your_test_merchant_code';
+
+    // Diagnostics: confirm what the function reads at runtime (token length only; do not log full token)
+    console.log('SUMUP_SANDBOX_TOKEN length:', String(accessToken).length);
+    console.log('SUMUP_MERCHANT_CODE:', merchantCode);
     const checkoutBaseUrl = 'https://api.sumup.com/v0.1/checkouts';
 
     // Create checkout session
