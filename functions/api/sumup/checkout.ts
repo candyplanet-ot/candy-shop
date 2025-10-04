@@ -75,8 +75,9 @@ export async function onRequestPost({ request, env }: { request: Request, env: a
     const checkoutBaseUrl = 'https://api.sumup.com/v0.1/checkouts';
 
     // Create checkout session
+    const checkoutReference = `${order.id}-${(globalThis as any).crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2, 10)}`;
     const payload = {
-      checkout_reference: order.id,
+      checkout_reference: checkoutReference,
       amount: Math.round(order.total_amount * 100), // Convert to cents
       currency: order.currency || 'EUR',
       merchant_code: merchantCode,
