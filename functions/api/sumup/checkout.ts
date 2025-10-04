@@ -7,9 +7,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
-// Temporary SumUp sandbox access token (valid ~1 hour). Use only for testing.
-const SUMUP_ACCESS_TOKEN = "at_classic_h0jvZceqicKAIyBflWYUYgiKVKEzIUYoUawlJmXvICOXijr8qOkJc";
-
 // Handle CORS preflight
 function handleOptions() {
   return new Response(null, {
@@ -69,10 +66,10 @@ export async function onRequestPost({ request, env }: { request: Request, env: a
       order = data;
     }
 
-    // Use pre-generated SumUp sandbox token from environment, fallback to temporary token
-    const accessToken = env.SUMUP_SANDBOX_TOKEN || SUMUP_ACCESS_TOKEN;
+    // Use pre-generated SumUp sandbox token from environment only
+    const accessToken = env.SUMUP_SANDBOX_TOKEN;
     if (!accessToken) {
-      throw new Error('SumUp access token is not configured');
+      throw new Error('SUMUP_SANDBOX_TOKEN is not configured');
     }
     const merchantCode = env.SUMUP_MERCHANT_CODE || 'your_test_merchant_code';
     const checkoutBaseUrl = 'https://api.sumup.com/v0.1/checkouts';
