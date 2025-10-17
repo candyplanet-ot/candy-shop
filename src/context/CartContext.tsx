@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 export type CartItem = {
@@ -71,7 +70,7 @@ export const useCart = () => {
 };
 
 
-=======
+
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 export type CartItem = {
@@ -144,4 +143,5 @@ export const useCart = () => {
 };
 
 
->>>>>>> cf3b96f63dd429b0a17bbe128b6c7a693ae364f5
+
+
