@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 
 // Initialize Stripe with secret key from environment
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-09-30.clover',
 });
 
