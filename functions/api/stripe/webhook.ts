@@ -1,10 +1,5 @@
 import Stripe from 'stripe';
 
-// Initialize Stripe with secret key from environment
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-09-30.clover',
-});
-
 // Type definitions
 interface WebhookEvent {
   id: string;
@@ -68,6 +63,11 @@ export async function onRequestPost({ request, env }: { request: Request; env: a
         headers: getCorsHeaders(request),
       });
     }
+
+    // Initialize Stripe with secret key from environment
+    const stripe = new Stripe(env.STRIPE_SECRET_KEY!, {
+      apiVersion: '2025-09-30.clover',
+    });
 
     // Get the raw body and signature
     const body = await request.text();
