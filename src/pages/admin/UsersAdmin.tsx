@@ -78,8 +78,4 @@ const UsersAdmin = () => {
 };
 
 export default UsersAdmin;
-<<<<<<< HEAD
 
-
-=======
->>>>>>> e90f33a (Updated Stripe integration and frontend files)
