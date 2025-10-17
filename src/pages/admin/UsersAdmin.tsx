@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -164,4 +163,5 @@ const UsersAdmin = () => {
 export default UsersAdmin;
 
 
->>>>>>> cf3b96f63dd429b0a17bbe128b6c7a693ae364f5
+
+
