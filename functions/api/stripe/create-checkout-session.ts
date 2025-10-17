@@ -46,7 +46,7 @@ export async function onRequestPost({ request, env }: { request: Request; env: a
     console.log('Processing Stripe Checkout Session creation request');
 
     // Use env binding for Cloudflare or fallback to Node.js process.env
-    const STRIPE_KEY = env?.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY;
+    const STRIPE_KEY = env?.STRIPE_SECRET_KEY || env.STRIPE_SECRET_KEY;
     if (!STRIPE_KEY) {
       console.error('Missing STRIPE_SECRET_KEY in environment variables');
       return new Response(JSON.stringify({ success: false, error: 'Stripe secret key not configured' }), {

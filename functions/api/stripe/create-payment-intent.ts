@@ -1,10 +1,5 @@
 import Stripe from 'stripe';
 
-// Initialize Stripe with secret key from environment
-const stripe = new Stripe(env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-09-30.clover',
-});
-
 // Type definitions
 interface CreateCheckoutSessionRequest {
   orderId: string;
@@ -61,6 +56,11 @@ export async function onRequestPost({ request, env }: { request: Request; env: a
         headers: { ...getCorsHeaders(request), 'Content-Type': 'application/json' },
       });
     }
+
+    // Initialize Stripe with secret key from environment
+    const stripe = new Stripe(env.STRIPE_SECRET_KEY!, {
+      apiVersion: '2025-09-30.clover',
+    });
 
     // Parse JSON payload
     const body: CreateCheckoutSessionRequest = await request.json();
