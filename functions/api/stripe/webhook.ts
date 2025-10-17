@@ -106,12 +106,28 @@ export async function onRequestPost({ request, env }: { request: Request; env: a
         if (orderId) {
           console.log('Updating order status for order ID:', orderId);
 
-          // Here you would update your database to mark the order as paid
-          // For example, using Supabase or your database of choice
-          // await supabase.from('orders').update({ status: 'paid' }).eq('id', orderId);
+          // Update order status to paid in Supabase
+          try {
+            // Use fetch to call a Supabase API endpoint or use a database client
+            // For now, we'll use a simple fetch to update the order
+            const response = await fetch(`${env.SUPABASE_URL}/rest/v1/orders?id=eq.${orderId}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${env.SUPABASE_ANON_KEY}`,
+                'apikey': env.SUPABASE_ANON_KEY!,
+              },
+              body: JSON.stringify({ status: 'paid' }),
+            });
 
-          // For now, just log it
-          console.log('Order', orderId, 'has been paid successfully');
+            if (response.ok) {
+              console.log('Order', orderId, 'has been marked as paid successfully');
+            } else {
+              console.error('Failed to update order status:', response.statusText);
+            }
+          } catch (dbError) {
+            console.error('Failed to update order status in database:', dbError);
+          }
         } else {
           console.error('No order_id found in session metadata');
         }
@@ -126,8 +142,26 @@ export async function onRequestPost({ request, env }: { request: Request; env: a
         if (failedOrderId) {
           console.log('Payment failed for order ID:', failedOrderId);
 
-          // Update order status to failed or handle accordingly
-          // await supabase.from('orders').update({ status: 'failed' }).eq('id', failedOrderId);
+          // Update order status to failed in Supabase
+          try {
+            const response = await fetch(`${env.SUPABASE_URL}/rest/v1/orders?id=eq.${failedOrderId}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${env.SUPABASE_ANON_KEY}`,
+                'apikey': env.SUPABASE_ANON_KEY!,
+              },
+              body: JSON.stringify({ status: 'failed' }),
+            });
+
+            if (response.ok) {
+              console.log('Order', failedOrderId, 'has been marked as failed');
+            } else {
+              console.error('Failed to update failed order status:', response.statusText);
+            }
+          } catch (dbError) {
+            console.error('Failed to update failed order status in database:', dbError);
+          }
         }
         break;
 

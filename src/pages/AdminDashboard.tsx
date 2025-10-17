@@ -26,31 +26,56 @@ const AdminDashboard = () => {
     if (!isAuthed) return;
     const fetchMetrics = async () => {
       setMetricsLoading(true);
-      // Total products
-      const { count: productsCount } = await supabase.from('products').select('*', { count: 'exact', head: true });
-      setTotalProducts(productsCount || 0);
-      // Total orders
-      const { count } = await supabase.from('orders').select('*', { count: 'exact', head: true });
-      setTotalOrders(count || 0);
-      // Total revenue
-      const { data: items } = await supabase.from('order_items').select('product_id, quantity, price');
-      const revenue = items?.reduce((sum, item) => sum + item.quantity * item.price, 0) || 0;
-      setTotalRevenue(revenue);
-      // Best seller
-      if (items && items.length > 0) {
-        const grouped = items.reduce((acc, item) => {
-          acc[item.product_id] = (acc[item.product_id] || 0) + item.quantity;
-          return acc;
-        }, {} as Record<string, number>);
-        const bestProductId = Object.keys(grouped).reduce((a, b) => grouped[a] > grouped[b] ? a : b);
-        if (bestProductId) {
-          const { data: product } = await supabase.from('products').select('name').eq('id', bestProductId).single();
-          if (product) {
-            setBestSeller({ name: product.name, quantity: grouped[bestProductId] });
+      try {
+        // Total products
+        const { count: productsCount } = await supabase.from('products').select('*', { count: 'exact', head: true });
+        setTotalProducts(productsCount || 0);
+
+        // Total orders - only count paid orders
+        const { count: paidOrdersCount } = await supabase.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'paid');
+        setTotalOrders(paidOrdersCount || 0);
+
+        // Total revenue - calculate from paid orders only
+        const { data: paidOrders } = await supabase.from('orders').select('id').eq('status', 'paid');
+        if (paidOrders && paidOrders.length > 0) {
+          const orderIds = paidOrders.map(order => order.id);
+          const { data: paidOrderItems } = await supabase
+            .from('order_items')
+            .select('quantity, price')
+            .in('order_id', orderIds);
+          const revenue = paidOrderItems?.reduce((sum, item) => sum + item.quantity * item.price, 0) || 0;
+          setTotalRevenue(revenue);
+
+          // Best seller - from paid orders only
+          if (paidOrderItems && paidOrderItems.length > 0) {
+            const { data: allPaidItems } = await supabase
+              .from('order_items')
+              .select('product_id, quantity')
+              .in('order_id', orderIds);
+
+            if (allPaidItems && allPaidItems.length > 0) {
+              const grouped = allPaidItems.reduce((acc, item) => {
+                acc[item.product_id] = (acc[item.product_id] || 0) + item.quantity;
+                return acc;
+              }, {} as Record<string, number>);
+              const bestProductId = Object.keys(grouped).reduce((a, b) => grouped[a] > grouped[b] ? a : b);
+              if (bestProductId) {
+                const { data: product } = await supabase.from('products').select('name').eq('id', bestProductId).single();
+                if (product) {
+                  setBestSeller({ name: product.name, quantity: grouped[bestProductId] });
+                }
+              }
+            }
           }
+        } else {
+          setTotalRevenue(0);
+          setBestSeller(null);
         }
+      } catch (error) {
+        console.error('Error fetching metrics:', error);
+      } finally {
+        setMetricsLoading(false);
       }
-      setMetricsLoading(false);
     };
     fetchMetrics();
   }, [isAuthed]);
