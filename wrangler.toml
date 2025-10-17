@@ -24,3 +24,10 @@ external_modules = ["stripe"]
 # Development environment  
 [env.development]
 [env.development.vars]
+
+name = "keepalive-worker"
+main = "functions/keepalive.ts"
+compatibility_date = "2024-01-01"
+
+[triggers]
+crons = ["*/5 * * * *"]
