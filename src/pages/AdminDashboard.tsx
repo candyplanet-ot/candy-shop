@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -280,4 +280,5 @@ const AdminDashboard = () => {
 export default AdminDashboard;
 
 
->>>>>>> cf3b96f63dd429b0a17bbe128b6c7a693ae364f5
+
+
