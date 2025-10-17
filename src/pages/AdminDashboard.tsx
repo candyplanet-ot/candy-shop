@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -137,5 +136,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
-

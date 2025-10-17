@@ -11,5 +11,3 @@ if (!envUrl || !envAnon) {
 }
 
 export const supabase = createClient(envUrl, envAnon);
-
-
