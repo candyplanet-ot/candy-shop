@@ -154,6 +154,13 @@ const AdminDashboard = () => {
               <Button>Open Users</Button>
             </Link>
           </div>
+          <div className="rounded-lg border p-4">
+            <h2 className="font-bold mb-2">Orders</h2>
+            <p className="mb-3">View all orders with customer details and items.</p>
+            <Link to="/admin/orders">
+              <Button>Open Orders</Button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

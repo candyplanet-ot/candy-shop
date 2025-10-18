@@ -21,6 +21,7 @@ import ThankYou from "./pages/ThankYou";
 import Cancel from "./pages/Cancel";
 import Navigation from "./components/Navigation";
 import GalleryAdmin from "./pages/admin/GalleryAdmin";
+import OrdersAdmin from "./pages/admin/OrdersAdmin";
 import Footer from "./components/Footer";
 import SEOHead from "./components/SEOHead";
 
@@ -76,6 +77,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <GalleryAdmin />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/orders"
+            element={
+              <ProtectedRoute>
+                <OrdersAdmin />
               </ProtectedRoute>
             }
           />

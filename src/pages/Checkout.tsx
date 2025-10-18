@@ -62,10 +62,23 @@ const Checkout = () => {
       // Get current user session
       const { data } = await supabase.auth.getSession();
 
-      // Insert order
+      // Insert order with shipping details
       const { data: order, error: orderErr } = await supabase
         .from("orders")
-        .insert({ user_id: data.session?.user.id || null, status: "pending" })
+        .insert({
+          user_id: data.session?.user.id || null,
+          status: "pending",
+          customer_name: form.fullName,
+          customer_email: data.session?.user.email || null,
+          shipping_address: {
+            address1: form.address1,
+            address2: form.address2,
+            city: form.city,
+            postal_code: form.postalCode,
+            country: form.country,
+            phone: form.phone,
+          }
+        })
         .select("id")
         .single();
 
