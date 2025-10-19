@@ -15,6 +15,7 @@ const Checkout = () => {
 
   const [form, setForm] = useState({
     fullName: "",
+    email: "",
     address1: "",
     address2: "",
     city: "",
@@ -59,7 +60,7 @@ const Checkout = () => {
     setLoading(true);
 
     try {
-      // Get current user session
+      // Get current user session (optional)
       const { data } = await supabase.auth.getSession();
 
       // Insert order with shipping details
@@ -69,7 +70,7 @@ const Checkout = () => {
           user_id: data.session?.user.id || null,
           status: "pending",
           customer_name: form.fullName,
-          customer_email: data.session?.user.email || null,
+          customer_email: form.email || data.session?.user.email || null,
           shipping_address: {
             address1: form.address1,
             address2: form.address2,
@@ -77,7 +78,8 @@ const Checkout = () => {
             postal_code: form.postalCode,
             country: form.country,
             phone: form.phone,
-          }
+          },
+          total_amount: Math.round(subtotal * 100), // Store total in cents
         })
         .select("id")
         .single();
@@ -133,6 +135,15 @@ const Checkout = () => {
                   <Input
                     value={form.fullName}
                     onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>Email</Label>
+                  <Input
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
                     required
                   />
                 </div>
