@@ -60,17 +60,16 @@ const Checkout = () => {
     setLoading(true);
 
     try {
-      // Get current user session (optional)
+      // Get current user session (optional for guest checkout)
       const { data } = await supabase.auth.getSession();
 
-      // Insert order with shipping details
+      // Insert order with shipping details - guest checkout compatible
       const { data: order, error: orderErr } = await supabase
         .from("orders")
         .insert({
-          user_id: data.session?.user.id || null,
+          user_id: data.session?.user.id || null, // null for guests
           status: "pending",
-          customer_name: form.fullName,
-          customer_email: form.email || data.session?.user.email || null,
+          subtotal: Math.round(subtotal * 100), // Store subtotal in cents (matches DB column name)
           shipping_address: {
             address1: form.address1,
             address2: form.address2,
@@ -79,7 +78,6 @@ const Checkout = () => {
             country: form.country,
             phone: form.phone,
           },
-          total_amount: Math.round(subtotal * 100), // Store total in cents
         })
         .select("id")
         .single();
@@ -88,7 +86,7 @@ const Checkout = () => {
         throw new Error(orderErr?.message ?? "Failed to create order");
       }
 
-      console.log("Order ID:", order.id);
+      console.log("Order created successfully:", order.id);
 
       // Insert order items
       const isValidUUID = (uuid: string) => {
@@ -96,7 +94,7 @@ const Checkout = () => {
         return uuidRegex.test(uuid);
       };
 
-      const rows = items
+      const orderItems = items
         .filter((i) => isValidUUID(String(i.id)))
         .map((i) => ({
           order_id: String(order.id),
@@ -105,13 +103,16 @@ const Checkout = () => {
           price: i.price,
         }));
 
-      const { error: itemsErr } = await supabase.from("order_items").insert(rows);
+      const { error: itemsErr } = await supabase.from("order_items").insert(orderItems);
       if (itemsErr) {
         throw new Error(itemsErr.message);
       }
 
+      console.log("Order items inserted successfully");
+
       // Create Stripe Checkout Session and redirect
       const sessionUrl = await createCheckoutSession(order.id);
+      console.log("Redirecting to Stripe checkout:", sessionUrl);
       window.location.assign(sessionUrl);
 
     } catch (err) {

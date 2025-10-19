@@ -7,9 +7,7 @@ type Order = {
   id: string;
   status: string;
   created_at: string;
-  customer_email?: string;
-  customer_name?: string;
-  total_amount?: number;
+  subtotal?: number;
   shipping_address?: {
     address1: string;
     address2?: string;
@@ -39,9 +37,7 @@ const OrdersAdmin = () => {
           id,
           status,
           created_at,
-          customer_email,
-          customer_name,
-          total_amount,
+          subtotal,
           shipping_address
         `)
         .order('created_at', { ascending: false });
@@ -126,8 +122,7 @@ const OrdersAdmin = () => {
                       </div>
                       <div>
                         <h3 className="font-semibold">Customer</h3>
-                        <p className="text-sm">{order.customer_name || 'N/A'}</p>
-                        <p className="text-sm text-gray-600">{order.customer_email || 'N/A'}</p>
+                        <p className="text-sm">{order.shipping_address ? 'Guest Customer' : 'N/A'}</p>
                       </div>
                       <div>
                         <h3 className="font-semibold">Status</h3>
@@ -163,9 +158,9 @@ const OrdersAdmin = () => {
                           </div>
                         ))}
                       </div>
-                      {order.total_amount && (
+                      {order.subtotal && (
                         <div className="mt-2 font-semibold">
-                          Total: €{(order.total_amount / 100).toFixed(2)}
+                          Total: €{(order.subtotal / 100).toFixed(2)}
                         </div>
                       )}
                     </div>
