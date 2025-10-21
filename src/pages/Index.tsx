@@ -90,23 +90,23 @@ const Index = () => {
   const whyChooseUs = [
     {
       icon: Heart,
-      title: "Expensive Experience",
-      description: "Unique Exclusive Experience — Discover rare treats and flavors unavailable anywhere else in your region"
+      title: "Expérience Exceptionnelle",
+      description: "Expérience Unique et Exclusive — Découvrez des friandises et saveurs rares introuvables ailleurs dans votre région"
     },
     {
       icon: Award,
-      title: "Global Discoveries",
-      description: "Curated specialties sourced from across the globe"
+      title: "Découvertes Mondiales",
+      description: "Spécialités sélectionnées provenant du monde entier"
     },
     {
       icon: Sparkles,
-      title: "Magical Taste",
-      description: "Each bite delivers a moment of pure joy and wonder"
+      title: "Goût Magique",
+      description: "Chaque bouchée apporte un moment de joie pure et d'émerveillement"
     },
     {
       icon: Users,
-      title: "Joyful Experience",
-      description: "Creating smiles and sweet memories for every customer"
+      title: "Expérience Joyeuse",
+      description: "Créer des sourires et des souvenirs sucrés pour chaque client"
     }
   ];
 
@@ -184,12 +184,12 @@ const Index = () => {
         {/* Content overlay */}
         <div className="relative z-10 container mx-auto px-4 py-20 lg:py-28">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="font-poppins text-white/80 mb-3 animate-fade-in">A Treat World Awaits 🍬</div>
+            <div className="font-poppins text-white/80 mb-3 animate-fade-in">Un Monde de Délices Vous Attend 🍬</div>
             <h1 className="text-5xl md:text-7xl font-baloo font-bold mb-4 animate-fade-in text-white text-shadow">
-              Welcome to <span className="bg-gradient-to-r from-pink-400 via-purple-500 to-pink-600 bg-clip-text text-transparent">Candy</span> Planet
+              Bienvenue sur <span className="bg-gradient-to-r from-pink-400 via-purple-500 to-pink-600 bg-clip-text text-transparent">Candy</span> Planet
             </h1>
             <p className="text-xl md:text-2xl font-poppins mb-8 animate-fade-in text-white/90 max-w-2xl mx-auto">
-              Different magical treats arranged to delight your every moment.
+              Différentes friandises magiques arrangées pour ravir chaque instant.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in">
@@ -199,7 +199,7 @@ const Index = () => {
                   className="group relative rounded-xl bg-gradient-candy text-white border-0 px-8 py-6 text-lg shine-border hover:shadow-magical hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                 >
                   <span className="relative z-10 flex items-center">
-                    Explore Our Products
+                    Découvrez Nos Produits
                     <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                   </span>
                   {/* Shimmer effect */}
@@ -211,7 +211,7 @@ const Index = () => {
                   variant="outline"
                   className="group rounded-xl bg-black/20 border-2 border-white/30 text-white hover:bg-white/10 hover:text-white hover:border-white/50 hover:-translate-y-1 px-8 py-6 text-lg transition-all duration-300"
                 >
-                  Our Story
+                  Notre Histoire
                   <Heart className="w-4 h-4 ml-2 group-hover:scale-110 transition-transform" />
                 </Button>
               </Link>
@@ -220,13 +220,13 @@ const Index = () => {
             {/* Trust Badges */}
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <div className="px-4 py-3 rounded-2xl bg-gradient-to-r from-pink-500/20 to-purple-500/20 backdrop-blur-sm border border-white/20 text-white text-sm font-poppins shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-                ⭐ Trusted by 10,000+ sweet lovers
+                ⭐ Approuvé par plus de 10 000 amateurs de sucreries
               </div>
               <div className="px-4 py-3 rounded-2xl bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-sm border border-white/20 text-white text-sm font-poppins shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-                🍃 Organic Ingredients
+                🍃 Ingrédients Biologiques
               </div>
               <div className="px-4 py-3 rounded-2xl bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-sm border border-white/20 text-white text-sm font-poppins shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-                🍬 Handcrafted Treats
+                🍬 Friandises Artisanales
               </div>
             </div>
           </div>
@@ -238,10 +238,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-5xl md:text-6xl font-baloo font-bold bg-gradient-candy bg-clip-text text-transparent mb-6">
-              Featured Magical Treats
+              Friandises Magiques Vedettes
             </h2>
             <p className="text-xl font-poppins text-muted-foreground max-w-2xl mx-auto">
-              Discover the taste of magic with our featured treats
+              Découvrez le goût de la magie avec nos friandises vedettes
             </p>
           </div>
 
@@ -271,7 +271,7 @@ const Index = () => {
                   </div>
                   <Link to="/products">
                     <Button variant="sweet" className="w-full hover-bounce">
-                      Order Now
+                      Commander Maintenant
                     </Button>
                   </Link>
                 </CardContent>
@@ -313,10 +313,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-5xl md:text-6xl font-baloo font-bold bg-gradient-sweet bg-clip-text text-transparent mb-6">
-              Why Choose Candy Planet?
+              Pourquoi Choisir Candy Planet ?
             </h2>
             <p className="text-xl font-poppins text-muted-foreground max-w-2xl mx-auto">
-              Our commitment to excellence in every aspect of quality, taste, and customer joy
+              Notre engagement envers l'excellence dans tous les aspects de la qualité, du goût et de la joie des clients
             </p>
           </div>
 
@@ -354,14 +354,14 @@ const Index = () => {
         </div>
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h2 className="text-4xl md:text-6xl font-baloo font-bold text-white mb-6">
-            Ready for a Treat Adventure?
+            Prêt pour une Aventure Sucrée ?
           </h2>
           <p className="text-xl md:text-2xl font-poppins text-white/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of happy customers who have discovered the magic of Candy Planet
+            Rejoignez des milliers de clients heureux qui ont découvert la magie de Candy Planet
           </p>
           <Link to="/products">
             <Button variant="sweet" size="lg" className="shine-border hover-bounce text-lg px-12">
-              Shop All Products
+              Acheter Tous les Produits
               <ArrowRight className="w-6 h-6 ml-2" />
             </Button>
           </Link>

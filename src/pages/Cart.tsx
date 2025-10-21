@@ -46,11 +46,11 @@ const Cart = () => {
   return (
     <div className="pt-16 p-6">
       <div className="container mx-auto grid gap-6">
-        <h1 className="text-2xl font-baloo font-bold">Your Cart</h1>
+        <h1 className="text-2xl font-baloo font-bold">Votre Panier</h1>
         <Card>
           <CardContent className="p-4">
             {items.length === 0 ? (
-              <div>Your cart is empty.</div>
+              <div>Votre panier est vide.</div>
             ) : (
               <div className="grid gap-4">
                 {items.map((i) => (
@@ -64,7 +64,7 @@ const Cart = () => {
                     </div>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full md:w-auto">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground hidden sm:inline">Qty</span>
+                        <span className="text-sm text-muted-foreground hidden sm:inline">Qté</span>
                         <Input
                           type="number"
                           className="w-24"
@@ -74,7 +74,7 @@ const Cart = () => {
                         />
                       </div>
                       <div className="md:w-24 text-left md:text-right font-medium">€{(i.price * i.quantity).toFixed(2)}</div>
-                      <Button variant="destructive" className="w-full sm:w-auto" onClick={() => removeItem(i.id)}>Remove</Button>
+                      <Button variant="destructive" className="w-full sm:w-auto" onClick={() => removeItem(i.id)}>Supprimer</Button>
                     </div>
                   </div>
                 ))}
@@ -84,11 +84,11 @@ const Cart = () => {
         </Card>
 
         <div className="flex items-center justify-between">
-          <div className="text-xl font-bold">Total: €{subtotal.toFixed(2)}</div>
+          <div className="text-xl font-bold">Total : €{subtotal.toFixed(2)}</div>
           <Button disabled={items.length === 0} onClick={() => {
             window.location.href = "/checkout";
           }}>
-            Checkout
+            Commander
           </Button>
         </div>
 

@@ -50,8 +50,8 @@ const ThankYou = () => {
       <div className="pt-16 p-6 container mx-auto max-w-3xl">
         <Card>
           <CardContent className="p-6 text-center space-y-4">
-            <h2 className="text-2xl font-bold">Verifying Payment...</h2>
-            <p>Please wait while we confirm your payment.</p>
+            <h2 className="text-2xl font-bold">Vérification du Paiement...</h2>
+            <p>Veuillez patienter pendant que nous confirmons votre paiement.</p>
           </CardContent>
         </Card>
       </div>
@@ -63,11 +63,11 @@ const ThankYou = () => {
       <div className="pt-16 p-6 container mx-auto max-w-3xl">
         <Card>
           <CardContent className="p-6 text-center space-y-4">
-            <h2 className="text-2xl font-bold text-red-600">Payment Verification Failed</h2>
+            <h2 className="text-2xl font-bold text-red-600">Échec de la Vérification du Paiement</h2>
             <p className="text-lg">{error}</p>
-            <p>If you believe this is an error, please contact our support team.</p>
+            <p>Si vous pensez qu'il s'agit d'une erreur, veuillez contacter notre équipe de support.</p>
             <Button onClick={() => navigate("/")} className="w-full max-w-xs mx-auto">
-              Return to Home
+              Retour à l'Accueil
             </Button>
           </CardContent>
         </Card>
@@ -79,11 +79,11 @@ const ThankYou = () => {
     <div className="pt-16 p-6 container mx-auto max-w-3xl">
       <Card>
         <CardContent className="p-6 text-center space-y-4">
-          <h2 className="text-2xl font-bold text-green-600">Thank You for Your Order!</h2>
-          <p className="text-lg">Your payment has been processed successfully.</p>
-          <p className="text-lg">We hope you enjoy your candies!</p>
+          <h2 className="text-2xl font-bold text-green-600">Merci pour Votre Commande !</h2>
+          <p className="text-lg">Votre paiement a été traité avec succès.</p>
+          <p className="text-lg">Nous espérons que vous apprécierez vos bonbons !</p>
           <Button onClick={() => navigate("/")} className="w-full max-w-xs mx-auto">
-            Continue Shopping
+            Continuer les Achats
           </Button>
         </CardContent>
       </Card>

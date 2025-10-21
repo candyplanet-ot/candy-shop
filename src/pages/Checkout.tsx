@@ -125,14 +125,14 @@ const Checkout = () => {
   return (
     <div className="pt-16 p-6">
       <div className="container mx-auto grid gap-6 max-w-3xl">
-        <h1 className="text-2xl font-baloo font-bold">Checkout</h1>
+        <h1 className="text-2xl font-baloo font-bold">Paiement</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardContent className="p-4 space-y-3">
-                <h2 className="font-bold mb-2">Shipping Details</h2>
+                <h2 className="font-bold mb-2">Détails de Livraison</h2>
                 <div>
-                  <Label>Full Name</Label>
+                  <Label>Nom Complet</Label>
                   <Input
                     value={form.fullName}
                     onChange={(e) => setForm({ ...form, fullName: e.target.value })}
@@ -149,7 +149,7 @@ const Checkout = () => {
                   />
                 </div>
                 <div>
-                  <Label>Address Line 1</Label>
+                  <Label>Adresse Ligne 1</Label>
                   <Input
                     value={form.address1}
                     onChange={(e) => setForm({ ...form, address1: e.target.value })}
@@ -157,7 +157,7 @@ const Checkout = () => {
                   />
                 </div>
                 <div>
-                  <Label>Address Line 2 (optional)</Label>
+                  <Label>Adresse Ligne 2 (optionnel)</Label>
                   <Input
                     value={form.address2}
                     onChange={(e) => setForm({ ...form, address2: e.target.value })}
@@ -165,7 +165,7 @@ const Checkout = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label>City</Label>
+                    <Label>Ville</Label>
                     <Input
                       value={form.city}
                       onChange={(e) => setForm({ ...form, city: e.target.value })}
@@ -173,7 +173,7 @@ const Checkout = () => {
                     />
                   </div>
                   <div>
-                    <Label>Postal Code</Label>
+                    <Label>Code Postal</Label>
                     <Input
                       value={form.postalCode}
                       onChange={(e) => setForm({ ...form, postalCode: e.target.value })}
@@ -182,7 +182,7 @@ const Checkout = () => {
                   </div>
                 </div>
                 <div>
-                  <Label>Country</Label>
+                  <Label>Pays</Label>
                   <Input
                     value={form.country}
                     onChange={(e) => setForm({ ...form, country: e.target.value })}
@@ -190,7 +190,7 @@ const Checkout = () => {
                   />
                 </div>
                 <div>
-                  <Label>Phone</Label>
+                  <Label>Téléphone</Label>
                   <Input
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
@@ -200,7 +200,7 @@ const Checkout = () => {
             </Card>
             <Card>
               <CardContent className="p-4 space-y-3">
-                <h2 className="font-bold mb-2">Order Summary</h2>
+                <h2 className="font-bold mb-2">Résumé de la Commande</h2>
                 <div className="space-y-2 max-h-64 overflow-auto pr-1">
                   {items.map((i) => (
                     <div key={i.id} className="flex items-center justify-between text-sm">
@@ -215,7 +215,7 @@ const Checkout = () => {
                 </div>
                 {error && <div className="text-red-500 text-sm">{error}</div>}
                 <Button className="w-full" type="submit" disabled={loading || items.length === 0}>
-                  {loading ? "Creating Checkout..." : "Proceed to Payment"}
+                  {loading ? "Création du Paiement..." : "Procéder au Paiement"}
                 </Button>
               </CardContent>
             </Card>

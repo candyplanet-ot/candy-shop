@@ -95,70 +95,70 @@ const AdminDashboard = () => {
     <div className="pt-16 p-6">
       <div className="container mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-baloo font-bold">Admin</h1>
-          <Button variant="outline" onClick={handleSignOut}>Sign out</Button>
+          <h1 className="text-3xl font-baloo font-bold">Administrateur</h1>
+          <Button variant="outline" onClick={handleSignOut}>Se Déconnecter</Button>
         </div>
         <div className="grid gap-4">
           {metricsLoading ? (
             <div className="rounded-lg border p-4">
-              <p>Loading metrics...</p>
+              <p>Chargement des métriques...</p>
             </div>
           ) : (
             <>
               <Card>
                 <CardContent className="p-4">
-                  <h2 className="font-bold mb-2">Total Orders</h2>
+                  <h2 className="font-bold mb-2">Total des Commandes</h2>
                   <p className="text-2xl font-bold">{totalOrders}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4">
-                  <h2 className="font-bold mb-2">Total Products</h2>
+                  <h2 className="font-bold mb-2">Total des Produits</h2>
                   <p className="text-2xl font-bold">{totalProducts}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4">
-                  <h2 className="font-bold mb-2">Total Revenue</h2>
+                  <h2 className="font-bold mb-2">Revenus Totaux</h2>
                   <p className="text-2xl font-bold">€{totalRevenue.toFixed(2)}</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="p-4">
-                  <h2 className="font-bold mb-2">Best Seller</h2>
+                  <h2 className="font-bold mb-2">Meilleure Vente</h2>
                   <p className="text-lg">
-                    {bestSeller ? `${bestSeller.name} - ${bestSeller.quantity} sold` : 'No sales yet'}
+                    {bestSeller ? `${bestSeller.name} - ${bestSeller.quantity} vendus` : 'Aucune vente pour le moment'}
                   </p>
                 </CardContent>
               </Card>
             </>
           )}
           <div className="rounded-lg border p-4">
-            <h2 className="font-bold mb-2">Products</h2>
-            <p className="mb-3">Create, edit, and delete products.</p>
+            <h2 className="font-bold mb-2">Produits</h2>
+            <p className="mb-3">Créer, modifier et supprimer des produits.</p>
             <Link to="/admin/products">
-              <Button>Open Products</Button>
+              <Button>Ouvrir Produits</Button>
             </Link>
           </div>
           <div className="rounded-lg border p-4">
-            <h2 className="font-bold mb-2">Gallery</h2>
-            <p className="mb-3">Upload, browse, copy URLs, and delete images.</p>
+            <h2 className="font-bold mb-2">Galerie</h2>
+            <p className="mb-3">Télécharger, parcourir, copier les URLs et supprimer des images.</p>
             <Link to="/admin/gallery">
-              <Button>Open Gallery</Button>
+              <Button>Ouvrir Galerie</Button>
             </Link>
           </div>
           <div className="rounded-lg border p-4">
-            <h2 className="font-bold mb-2">Users</h2>
-            <p className="mb-3">Assign roles to users (admin/staff/user).</p>
+            <h2 className="font-bold mb-2">Utilisateurs</h2>
+            <p className="mb-3">Assigner des rôles aux utilisateurs (admin/staff/user).</p>
             <Link to="/admin/users">
-              <Button>Open Users</Button>
+              <Button>Ouvrir Utilisateurs</Button>
             </Link>
           </div>
           <div className="rounded-lg border p-4">
-            <h2 className="font-bold mb-2">Orders</h2>
-            <p className="mb-3">View all orders with customer details and items.</p>
+            <h2 className="font-bold mb-2">Commandes</h2>
+            <p className="mb-3">Voir toutes les commandes avec les détails clients et articles.</p>
             <Link to="/admin/orders">
-              <Button>Open Orders</Button>
+              <Button>Ouvrir Commandes</Button>
             </Link>
           </div>
         </div>

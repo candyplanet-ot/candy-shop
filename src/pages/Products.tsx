@@ -189,10 +189,10 @@ const Products = () => {
       <section className="py-20 bg-gradient-to-br from-secondary/20 to-accent/20">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-5xl md:text-7xl font-baloo font-bold bg-gradient-hero bg-clip-text text-transparent mb-6 animate-fade-in">
-            Our Magical Collection
+            Notre Collection Magique
           </h1>
           <p className="text-xl md:text-2xl font-poppins text-muted-foreground max-w-2xl mx-auto animate-fade-in">
-            Discover different treats that bring joy to every moment
+            Découvrez différentes friandises qui apportent de la joie à chaque instant
           </p>
         </div>
       </section>
@@ -219,7 +219,7 @@ const Products = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           {loading && (
-            <div className="mb-6">Loading products...</div>
+            <div className="mb-6">Chargement des produits...</div>
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
             {filteredProducts.map((product) => (
@@ -232,7 +232,7 @@ const Products = () => {
                 <CardContent className="p-4 md:p-6">
                   {product.featured && (
                     <Badge className="mb-4 bg-gradient-sweet text-white shine-border">
-                      ✨ Featured
+                      ✨ Vedette
                     </Badge>
                   )}
                   
@@ -274,14 +274,14 @@ const Products = () => {
                       }}
                     >
                       <ShoppingCart className="w-4 h-4 mr-2" />
-                      Add to Cart
+                      Ajouter au Panier
                     </Button>
                     {isAdmin && (
                       <Button
                         variant="outline"
                         onClick={() => navigate('/admin/products')}
                       >
-                        Edit
+                        Modifier
                       </Button>
                     )}
                   </div>

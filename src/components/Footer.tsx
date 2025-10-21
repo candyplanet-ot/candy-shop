@@ -12,13 +12,13 @@ const Footer = () => {
               Candy Planet
             </h3>
             <p className="font-poppins text-background/80">
-              Where sweet dreams come true — creating magical moments one Treat at a time.
+              Où les rêves sucrés deviennent réalité — créant des moments magiques un bonbon à la fois.
             </p>
           </div>
 
           {/* Contact */}
             <div className="space-y-4">
-              <h4 className="font-baloo text-xl font-bold text-primary">Visit Us</h4>
+              <h4 className="font-baloo text-xl font-bold text-primary">Nous Visiter</h4>
               <div className="space-y-2 font-poppins text-background/80">
                 <p>18 Rue Rouget de Lisle</p>
                 <p>34200 Sète, France</p>
@@ -26,26 +26,26 @@ const Footer = () => {
               </div>
               <a href="https://maps.app.goo.gl/TPeFRb3N6VLCP1XCA?g_st=ipc" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-poppins">
                 <MapPin className="w-4 h-4" />
-                View on Google Maps
+                Voir sur Google Maps
               </a>
             </div>
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h4 className="font-baloo text-xl font-bold text-primary">Quick Links</h4>
+            <h4 className="font-baloo text-xl font-bold text-primary">Liens Rapides</h4>
             <div className="space-y-2 font-poppins">
               <Link to="/about" className="block text-background/80 hover:text-primary transition-colors">
-                About Us
+                À Propos de Nous
               </Link>
               <Link to="/products" className="block text-background/80 hover:text-primary transition-colors">
-                Our Products
+                Nos Produits
               </Link>
             </div>
           </div>
 
           {/* Social */}
           <div className="space-y-4">
-            <h4 className="font-baloo text-xl font-bold text-primary">Follow Us</h4>
+            <h4 className="font-baloo text-xl font-bold text-primary">Suivez-Nous</h4>
             <div className="flex space-x-4">
               <a href="https://snapchat.com/t/abBiBDB7" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gradient-candy rounded-full flex items-center justify-center hover:scale-110 transition-transform">
                 <span className="text-white text-lg">👻</span>
@@ -60,7 +60,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="border-t border-background/20 mt-12 pt-8 text-center">
           <p className="font-poppins text-background/80 flex items-center justify-center gap-2">
-            © 2025 Candy Planet. All rights reserved.
+            © 2025 Candy Planet. Tous droits réservés.
             <span className="text-primary">🍭</span>
           </p>
         </div>

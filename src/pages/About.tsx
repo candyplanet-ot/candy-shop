@@ -57,10 +57,10 @@ const About = () => {
         <div className="absolute inset-0 bg-gradient-hero opacity-80" />
         <div className="relative z-10 text-center text-white px-4">
           <h1 className="text-5xl md:text-7xl font-baloo font-bold mb-6 animate-fade-in">
-            Our Sweet Story
+            Notre Histoire Sucrée
           </h1>
           <p className="text-xl md:text-2xl font-poppins max-w-2xl mx-auto animate-fade-in">
-            Where passion meets Adventure in every treat
+            Où la passion rencontre l'aventure dans chaque friandise
           </p>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-24 candy-stripe" />
@@ -88,9 +88,9 @@ const About = () => {
               <div className="bg-gradient-magical p-8 rounded-3xl shadow-magical">
                 <div className="bg-background rounded-2xl p-6 text-center">
                   <div className="text-4xl font-baloo font-bold text-primary mb-2">13+</div>
-                  <div className="text-sm font-poppins text-muted-foreground mb-4">Years of Magic</div>
+                  <div className="text-sm font-poppins text-muted-foreground mb-4">Années de Magie</div>
                   <div className="text-4xl font-baloo font-bold text-accent mb-2">50,000+</div>
-                  <div className="text-sm font-poppins text-muted-foreground mb-4">Happy Customers</div>
+                  <div className="text-sm font-poppins text-muted-foreground mb-4">Clients Heureux</div>
                   <div className="text-4xl font-baloo font-bold text-candy-mint mb-2">100+</div>
                   
                 </div>
@@ -105,10 +105,10 @@ const About = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-baloo font-bold bg-gradient-sweet bg-clip-text text-transparent mb-6">
-              Why Choose Candy Planet?
+              Pourquoi Choisir Candy Planet ?
             </h2>
             <p className="text-xl font-poppins text-muted-foreground max-w-2xl mx-auto">
-              Our commitment to Provide the best quality products to our customers
+              Notre engagement à fournir les meilleurs produits de qualité à nos clients
             </p>
           </div>
           
@@ -143,14 +143,14 @@ const About = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
             <h2 className="text-4xl md:text-6xl font-baloo font-bold bg-gradient-candy bg-clip-text text-transparent mb-8">
-              Our Mission
+              Notre Mission
             </h2>
             <p className="text-2xl font-poppins text-foreground leading-relaxed mb-8">
-              "Our goal is to get you to taste food from all around the world , just from your bed , one click and you have travelled the world."
+              "Notre objectif est de vous faire goûter à la nourriture du monde entier, juste depuis votre lit, un clic et vous avez voyagé dans le monde."
             </p>
             <div className="h-2 w-32 bg-gradient-candy mx-auto rounded-full mb-8" />
             <Button variant="hero" size="lg" className="shine-border hover-bounce">
-              Join Our Sweet Journey
+              Rejoignez Notre Voyage Sucré
             </Button>
           </div>
         </div>

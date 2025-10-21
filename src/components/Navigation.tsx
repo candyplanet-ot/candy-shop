@@ -42,9 +42,9 @@ const Navigation = () => {
   }, [location.pathname]);
 
   const navItems = [
-    { name: "Home", path: "/" },
-    { name: "About Us", path: "/about" },
-    { name: "Products", path: "/products" },
+    { name: "Accueil", path: "/" },
+    { name: "À Propos", path: "/about" },
+    { name: "Produits", path: "/products" },
   ];
 
   return (
@@ -88,7 +88,7 @@ const Navigation = () => {
                     variant="outline"
                     className="rounded-xl"
                   >
-                    Login
+                    Connexion
                   </Button>
                 </Link>
               );
@@ -109,7 +109,7 @@ const Navigation = () => {
                 className="relative rounded-xl bg-gradient-candy text-white border-0 px-6 py-2 font-medium hover:shadow-lg hover:shadow-pink-500/25 hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
               >
                 <ShoppingCart className="w-4 h-4 mr-2" />
-                <span className="relative z-10">Cart</span>
+                <span className="relative z-10">Panier</span>
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 opacity-0 hover:opacity-100 transition-opacity duration-300 blur-sm" />
               </Button>
             </Link>
@@ -152,7 +152,7 @@ const Navigation = () => {
                       variant="outline" 
                       className="w-full rounded-xl mb-2"
                     >
-                      Login
+                      Connexion
                     </Button>
                   </Link>
                 );
@@ -173,7 +173,7 @@ const Navigation = () => {
                   className="w-full rounded-xl bg-gradient-candy text-white border-0 font-medium hover:shadow-lg transition-all duration-300"
                 >
                   <ShoppingCart className="w-4 h-4 mr-2" />
-                  Cart
+                  Panier
                 </Button>
               </Link>
             </div>

@@ -104,28 +104,28 @@ const OrdersAdmin = () => {
   return (
     <div className="pt-16 p-6">
       <div className="container mx-auto grid gap-6">
-        <h1 className="text-2xl font-baloo font-bold">Manage Orders</h1>
+        <h1 className="text-2xl font-baloo font-bold">Gérer les Commandes</h1>
         <Card>
           <CardContent className="p-4">
             {loading ? (
-              <div>Loading orders...</div>
+              <div>Chargement des commandes...</div>
             ) : orders.length === 0 ? (
-              <div>No orders found.</div>
+              <div>Aucune commande trouvée.</div>
             ) : (
               <div className="space-y-4">
                 {orders.map((order) => (
                   <div key={order.id} className="border rounded-lg p-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                       <div>
-                        <h3 className="font-semibold">Order ID</h3>
+                        <h3 className="font-semibold">ID Commande</h3>
                         <p className="text-sm text-gray-600">{order.id}</p>
                       </div>
                       <div>
-                        <h3 className="font-semibold">Customer</h3>
+                        <h3 className="font-semibold">Client</h3>
                         <p className="text-sm">{order.shipping_address ? 'Guest Customer' : 'N/A'}</p>
                       </div>
                       <div>
-                        <h3 className="font-semibold">Status</h3>
+                        <h3 className="font-semibold">Statut</h3>
                         <p className={`text-sm font-medium ${getStatusColor(order.status)}`}>
                           {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                         </p>
@@ -139,7 +139,7 @@ const OrdersAdmin = () => {
                     </div>
                     {order.shipping_address && (
                       <div className="mb-4">
-                        <h3 className="font-semibold mb-2">Shipping Address</h3>
+                        <h3 className="font-semibold mb-2">Adresse de Livraison</h3>
                         <div className="text-sm text-gray-700">
                           <p>{order.shipping_address.address1}</p>
                           {order.shipping_address.address2 && <p>{order.shipping_address.address2}</p>}
@@ -150,7 +150,7 @@ const OrdersAdmin = () => {
                       </div>
                     )}
                     <div>
-                      <h3 className="font-semibold mb-2">Items Ordered</h3>
+                      <h3 className="font-semibold mb-2">Articles Commandés</h3>
                       <div className="space-y-1">
                         {order.items?.map((item, index) => (
                           <div key={index} className="text-sm">
@@ -160,7 +160,7 @@ const OrdersAdmin = () => {
                       </div>
                       {order.subtotal && (
                         <div className="mt-2 font-semibold">
-                          Total: €{(order.subtotal / 100).toFixed(2)}
+                          Total : €{(order.subtotal / 100).toFixed(2)}
                         </div>
                       )}
                     </div>
