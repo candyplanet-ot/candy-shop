@@ -57,6 +57,7 @@ const OrdersAdmin = () => {
             .select(`
               quantity,
               price,
+              product_name,
               products (
                 name
               )
@@ -69,7 +70,7 @@ const OrdersAdmin = () => {
           }
 
           const items = (itemsData || []).map(item => ({
-            product_name: (item.products as any)?.name || 'Unknown Product',
+            product_name: item.product_name || (item.products as any)?.name || 'Produit Inconnu',
             quantity: item.quantity,
             price: item.price,
           }));
@@ -225,14 +226,20 @@ const OrdersAdmin = () => {
                     <div>
                       <h3 className="font-semibold mb-2">Articles Commandés</h3>
                       <div className="space-y-1">
-                        {order.items?.map((item, index) => (
-                          <div key={index} className="text-sm">
-                            {item.product_name} - Quantité: {item.quantity} - €{(item.price / 100).toFixed(2)} chacun
+                        {order.items && order.items.length > 0 ? (
+                          order.items.map((item, index) => (
+                            <div key={index} className="text-sm bg-gray-50 p-2 rounded">
+                              <strong>{item.product_name}</strong> - Quantité: <span className="font-semibold text-blue-600">{item.quantity}</span> - Prix: €{(item.price / 100).toFixed(2)} chacun
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-sm text-red-600 bg-red-50 p-2 rounded">
+                            Aucun article trouvé pour cette commande
                           </div>
-                        ))}
+                        )}
                       </div>
                       {order.subtotal && (
-                        <div className="mt-2 font-semibold">
+                        <div className="mt-2 font-semibold text-lg border-t pt-2">
                           Total : €{(order.subtotal / 100).toFixed(2)}
                         </div>
                       )}

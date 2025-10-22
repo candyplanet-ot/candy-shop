@@ -53,7 +53,7 @@ const Checkout = () => {
     setError(null);
 
     if (items.length === 0) {
-      setError("Your cart is empty");
+      setError("Votre panier est vide");
       return;
     }
 
@@ -95,12 +95,12 @@ const Checkout = () => {
       };
 
       const orderItems = items
-        .filter((i) => isValidUUID(String(i.id)))
         .map((i) => ({
           order_id: String(order.id),
           product_id: String(i.id),
           quantity: i.quantity,
           price: i.price,
+          product_name: i.name, // Store product name at time of order
         }));
 
       const { error: itemsErr } = await supabase.from("order_items").insert(orderItems);
