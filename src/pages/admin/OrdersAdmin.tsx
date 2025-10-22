@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/lib/supabaseClient";
+import { useToast } from "@/components/ui/use-toast";
 
 type Order = {
   id: string;
@@ -26,6 +27,7 @@ type Order = {
 const OrdersAdmin = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   const loadOrders = async () => {
     setLoading(true);
@@ -101,6 +103,61 @@ const OrdersAdmin = () => {
     }
   };
 
+  const deleteOrder = async (orderId: string) => {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer cette commande ? Cette action est irréversible.')) {
+      return;
+    }
+
+    try {
+      // First delete order items
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .delete()
+        .eq('order_id', orderId);
+
+      if (itemsError) {
+        console.error('Error deleting order items:', itemsError);
+        toast({
+          title: "Erreur",
+          description: "Impossible de supprimer les articles de la commande.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Then delete the order
+      const { error: orderError } = await supabase
+        .from('orders')
+        .delete()
+        .eq('id', orderId);
+
+      if (orderError) {
+        console.error('Error deleting order:', orderError);
+        toast({
+          title: "Erreur",
+          description: "Impossible de supprimer la commande.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update local state
+      setOrders(orders.filter(order => order.id !== orderId));
+
+      toast({
+        title: "Succès",
+        description: "Commande supprimée avec succès.",
+      });
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur inattendue s'est produite.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="pt-16 p-6">
       <div className="container mx-auto grid gap-6">
@@ -115,14 +172,19 @@ const OrdersAdmin = () => {
               <div className="space-y-4">
                 {orders.map((order) => (
                   <div key={order.id} className="border rounded-lg p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
                       <div>
                         <h3 className="font-semibold">ID Commande</h3>
                         <p className="text-sm text-gray-600">{order.id}</p>
                       </div>
                       <div>
                         <h3 className="font-semibold">Client</h3>
-                        <p className="text-sm">{order.shipping_address ? 'Guest Customer' : 'N/A'}</p>
+                        <p className="text-sm">
+                          {order.shipping_address?.address1 ? order.shipping_address.address1.split(' ')[0] + ' ' + (order.shipping_address.address1.split(' ')[1] || '') : 'Client Invité'}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {order.shipping_address?.phone || 'N/A'}
+                        </p>
                       </div>
                       <div>
                         <h3 className="font-semibold">Statut</h3>
@@ -135,6 +197,17 @@ const OrdersAdmin = () => {
                         <p className="text-sm text-gray-600">
                           {new Date(order.created_at).toLocaleDateString()}
                         </p>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">Actions</h3>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => deleteOrder(order.id)}
+                          className="text-xs"
+                        >
+                          Supprimer
+                        </Button>
                       </div>
                     </div>
                     {order.shipping_address && (
@@ -154,7 +227,7 @@ const OrdersAdmin = () => {
                       <div className="space-y-1">
                         {order.items?.map((item, index) => (
                           <div key={index} className="text-sm">
-                            {item.product_name} - Quantity: {item.quantity} - €{(item.price / 100).toFixed(2)} each
+                            {item.product_name} - Quantité: {item.quantity} - €{(item.price / 100).toFixed(2)} chacun
                           </div>
                         ))}
                       </div>
