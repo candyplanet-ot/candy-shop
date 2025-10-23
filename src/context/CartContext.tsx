@@ -217,6 +217,17 @@ export const CartProvider = ({ children }: { children: JSX.Element }) => {
     loadCart();
   }, [loadCart]);
 
+  // Auto-refresh cart data after initial load to ensure consistency
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => {
+        loadCart();
+      }, 1000); // Refresh after 1 second to ensure data consistency
+
+      return () => clearTimeout(timer);
+    }
+  }, [loading, loadCart]);
+
   const addItem = useCallback(async (item: Omit<CartItem, "quantity">, qty = 1) => {
     setItems((prev) => {
       const existing = prev.find((p) => p.id === item.id);
