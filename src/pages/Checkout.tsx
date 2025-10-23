@@ -99,7 +99,7 @@ const Checkout = () => {
           order_id: String(order.id),
           product_id: String(i.id),
           quantity: i.quantity,
-          price: i.price,
+          price: Math.round(i.price * 100), // Convert to cents for database
           product_name: i.name, // Store product name at time of order
         }));
 
