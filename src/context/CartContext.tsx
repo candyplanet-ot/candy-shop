@@ -222,7 +222,7 @@ export const CartProvider = ({ children }: { children: JSX.Element }) => {
     if (!loading) {
       const timer = setTimeout(() => {
         loadCart();
-      }, 1000); // Refresh after 1 second to ensure data consistency
+      }, 4000); // Refresh after 4 seconds to ensure data consistency
 
       return () => clearTimeout(timer);
     }
