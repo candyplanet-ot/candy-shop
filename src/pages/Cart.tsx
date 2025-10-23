@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useState } from "react";
 
 const Cart = () => {
-  const { items, removeItem, updateQuantity, subtotal, clear } = useCart();
+  const { items, removeItem, updateQuantity, subtotal, clear, loading } = useCart();
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,6 +42,21 @@ const Cart = () => {
     setPlacing(false);
     alert("Order placed!");
   };
+
+  if (loading) {
+    return (
+      <div className="pt-16 p-6">
+        <div className="container mx-auto grid gap-6">
+          <h1 className="text-2xl font-baloo font-bold">Votre Panier</h1>
+          <Card>
+            <CardContent className="p-4">
+              <div>Chargement de votre panier...</div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-16 p-6">

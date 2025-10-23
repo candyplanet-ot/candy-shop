@@ -51,12 +51,13 @@ export const CartProvider = ({ children }: { children: JSX.Element }) => {
         return;
       }
 
+      // Try direct query without RLS first to test
       let query = supabase
         .from('cart_items')
         .select(`
           id,
           quantity,
-          products (
+          products!inner (
             id,
             name,
             price,
@@ -74,6 +75,19 @@ export const CartProvider = ({ children }: { children: JSX.Element }) => {
 
       if (error) {
         console.error('Error loading cart:', error);
+        // Fallback: try without the products join to see if it's a join issue
+        const fallbackQuery = supabase
+          .from('cart_items')
+          .select('*');
+
+        if (userId) {
+          fallbackQuery.eq('user_id', userId);
+        } else if (token) {
+          fallbackQuery.eq('guest_token', token);
+        }
+
+        const { data: fallbackData, error: fallbackError } = await fallbackQuery;
+        console.log('Fallback query result:', fallbackData, fallbackError);
         setLoading(false);
         return;
       }
