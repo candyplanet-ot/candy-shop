@@ -52,27 +52,33 @@ const OrdersAdmin = () => {
       // Fetch order items for each order
       const ordersWithItems = await Promise.all(
         (ordersData || []).map(async (order) => {
+          console.log('Fetching items for order:', order.id);
           const { data: itemsData, error: itemsError } = await supabase
             .from('order_items')
             .select(`
               quantity,
               price,
-              products (
+              product_id,
+              products!inner (
                 name
               )
             `)
             .eq('order_id', order.id);
 
           if (itemsError) {
-            console.error('Error fetching order items:', itemsError);
+            console.error('Error fetching order items for order', order.id, ':', itemsError);
             return { ...order, items: [] };
           }
+
+          console.log('Items data for order', order.id, ':', itemsData);
 
           const items = (itemsData || []).map(item => ({
             product_name: (item.products as any)?.name || 'Produit Inconnu',
             quantity: item.quantity,
             price: item.price,
           }));
+
+          console.log('Processed items for order', order.id, ':', items);
 
           return { ...order, items };
         })
