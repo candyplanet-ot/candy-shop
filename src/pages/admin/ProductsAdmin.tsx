@@ -134,14 +134,38 @@ const ProductsAdmin = () => {
   };
 
   const save = async () => {
-    if (editing) {
-      await supabase.from("products").update(form).eq("id", editing.id);
-    } else {
-      await supabase.from("products").insert(form);
+    try {
+      if (editing) {
+        const { error } = await supabase.from("products").update(form).eq("id", editing.id);
+        if (error) {
+          console.error('Error updating product:', error);
+          alert('Error updating product: ' + error.message);
+          return;
+        }
+      } else {
+        // Generate a unique ID for new products
+        const productData = {
+          ...form,
+          id: crypto.randomUUID()
+        };
+        const { error } = await supabase.from("products").insert(productData);
+        if (error) {
+          console.error('Error creating product:', error);
+          alert('Error creating product: ' + error.message);
+          return;
+        }
+      }
+      await loadProducts();
+      // Also refresh products on the main products page
+      if (window.parent) {
+        window.parent.location.reload();
+      }
+      setEditing(null);
+      setForm(emptyProduct);
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      alert('Unexpected error occurred');
     }
-    await loadProducts();
-    setEditing(null);
-    setForm(emptyProduct);
   };
 
   const remove = async (id: number) => {

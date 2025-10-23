@@ -48,17 +48,22 @@ const Products = () => {
       }
 
       // Load products from DB
-      const { data: prod, error } = await supabase
-        .from('products')
-        .select('id, name, category, price, image, featured, description, stock')
-        .order('id', { ascending: true });
-      if (!error && prod) {
-        setDbProducts(prod);
-      }
-      setLoading(false);
+      loadProducts();
     };
     init();
   }, []);
+
+  const loadProducts = async () => {
+    setLoading(true);
+    const { data: prod, error } = await supabase
+      .from('products')
+      .select('id, name, category, price, image, featured, description, stock')
+      .order('created_at', { ascending: false });
+    if (!error && prod) {
+      setDbProducts(prod);
+    }
+    setLoading(false);
+  };
 
   const fallbackProducts = [];
 
@@ -78,7 +83,7 @@ const Products = () => {
       id: p.id,
       name: p.name,
       category: p.category,
-      price: typeof p.price === 'number' ? `€${p.price.toFixed(2)}` : String(p.price),
+      price: typeof p.price === 'number' ? `€${(p.price / 100).toFixed(2)}` : String(p.price),
       image: p.image,
       featured: !!p.featured,
       description: p.description ?? '',
@@ -185,8 +190,8 @@ const Products = () => {
                       className="flex-1 bg-gradient-candy hover:opacity-90 text-white border-0"
                       onClick={() => {
                         const priceNumber = typeof product.price === 'string'
-                          ? Number(String(product.price).replace(/[^0-9.]/g, ""))
-                          : Number(product.price);
+                          ? Number(String(product.price).replace(/[^0-9.]/g, "")) / 100
+                          : Number(product.price) / 100;
                         addItem({ id: String(product.id), name: product.name, price: priceNumber, imageUrl: product.image });
                         toast({ title: "Added to cart", description: product.name });
                       }}
