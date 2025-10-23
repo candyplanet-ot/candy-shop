@@ -57,7 +57,6 @@ const OrdersAdmin = () => {
             .select(`
               quantity,
               price,
-              product_name,
               products (
                 name
               )
@@ -70,7 +69,7 @@ const OrdersAdmin = () => {
           }
 
           const items = (itemsData || []).map(item => ({
-            product_name: item.product_name || (item.products as any)?.name || 'Produit Inconnu',
+            product_name: (item.products as any)?.name || 'Produit Inconnu',
             quantity: item.quantity,
             price: item.price,
           }));
