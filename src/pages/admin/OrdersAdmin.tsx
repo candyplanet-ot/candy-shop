@@ -19,6 +19,7 @@ type Order = {
   };
   items?: {
     product_name: string;
+    product_image?: string;
     quantity: number;
     price: number;
   }[];
@@ -60,7 +61,8 @@ const OrdersAdmin = () => {
               price,
               product_id,
               products!inner (
-                name
+                name,
+                image
               )
             `)
             .eq('order_id', order.id);
@@ -74,6 +76,7 @@ const OrdersAdmin = () => {
 
           const items = (itemsData || []).map(item => ({
             product_name: (item.products as any)?.name || 'Produit Inconnu',
+            product_image: (item.products as any)?.image,
             quantity: item.quantity,
             price: item.price,
           }));
@@ -233,8 +236,21 @@ const OrdersAdmin = () => {
                       <div className="space-y-1">
                         {order.items && order.items.length > 0 ? (
                           order.items.map((item, index) => (
-                            <div key={index} className="text-sm bg-gray-50 p-2 rounded">
-                              <strong>{item.product_name}</strong> - Quantité: <span className="font-semibold text-blue-600">{item.quantity}</span> - Prix: €{(item.price / 100).toFixed(2)} chacun
+                            <div key={index} className="text-sm bg-gray-50 p-2 rounded flex items-center gap-3">
+                              {item.product_image && (
+                                <img
+                                  src={item.product_image}
+                                  alt={item.product_name}
+                                  className="w-12 h-12 object-cover rounded"
+                                />
+                              )}
+                              <div className="flex-1">
+                                <div className="font-semibold">{item.product_name}</div>
+                                <div className="text-gray-600">
+                                  Quantité: <span className="font-semibold text-blue-600">{item.quantity}</span> -
+                                  Prix: €{(item.price / 100).toFixed(2)} chacun
+                                </div>
+                              </div>
                             </div>
                           ))
                         ) : (

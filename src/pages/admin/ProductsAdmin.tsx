@@ -43,8 +43,7 @@ const ProductsAdmin = () => {
     const d = new Date();
     return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, "0")}`;
   })();
-  const defaultCategories = ["Lollipops", "Chocolates", "Gummies", "Cotton Candy"];
-  const [categories, setCategories] = useState<string[]>(defaultCategories);
+  const [categories, setCategories] = useState<string[]>([]);
   const [newCategory, setNewCategory] = useState("");
 
   const loadProducts = async () => {
@@ -53,11 +52,10 @@ const ProductsAdmin = () => {
     if (!error && data) setProducts(data as Product[]);
     setLoading(false);
 
-    // Derive categories from products + defaults
+    // Derive categories from products only
     if (!error && data) {
       const fromDb = Array.from(new Set((data as Product[]).map((p) => p.category).filter(Boolean)));
-      const merged = Array.from(new Set([...defaultCategories, ...fromDb]));
-      setCategories(merged);
+      setCategories(fromDb);
     }
   };
 
@@ -174,29 +172,56 @@ const ProductsAdmin = () => {
   };
 
   const deleteCategory = async (categoryToDelete: string) => {
-    if (!confirm(`Delete category "${categoryToDelete}"? This will clear the category for all products using it.`)) return;
+    if (!confirm(`Supprimer la catégorie "${categoryToDelete}" ? Cela effacera la catégorie pour tous les produits qui l'utilisent.`)) return;
 
-    // Update DB: set category = '' for all products with this category
-    const { error: updateError } = await supabase
-      .from("products")
-      .update({ category: '' })
-      .eq("category", categoryToDelete);
+    console.log('Deleting category:', categoryToDelete);
 
-    if (updateError) {
-      alert(`Error updating products: ${updateError.message}`);
-      return;
+    try {
+      // First check how many products have this category
+      const { data: productsWithCategory, error: countError } = await supabase
+        .from("products")
+        .select("id")
+        .eq("category", categoryToDelete);
+
+      if (countError) {
+        console.error('Error counting products:', countError);
+        alert(`Erreur lors du comptage des produits: ${countError.message}`);
+        return;
+      }
+
+      console.log(`Found ${productsWithCategory?.length || 0} products with category "${categoryToDelete}"`);
+
+      // Update DB: set category = '' for all products with this category
+      const { data: updateData, error: updateError } = await supabase
+        .from("products")
+        .update({ category: null })
+        .eq("category", categoryToDelete)
+        .select();
+
+      if (updateError) {
+        console.error('Error updating products:', updateError);
+        alert(`Erreur lors de la mise à jour des produits: ${updateError.message}`);
+        return;
+      }
+
+      console.log('Update result:', updateData);
+
+      // Update local categories temporarily
+      setCategories((prev) => prev.filter((c) => c !== categoryToDelete));
+
+      // Reset form if it was using this category
+      if (form.category === categoryToDelete) {
+        setForm((prev) => ({ ...prev, category: null }));
+      }
+
+      // Reload products to reflect changes and refresh categories
+      await loadProducts();
+
+      alert(`Catégorie "${categoryToDelete}" supprimée avec succès. ${updateData?.length || 0} produits mis à jour.`);
+    } catch (error) {
+      console.error('Unexpected error deleting category:', error);
+      alert('Une erreur inattendue s\'est produite lors de la suppression de la catégorie.');
     }
-
-    // Update local categories temporarily
-    setCategories((prev) => prev.filter((c) => c !== categoryToDelete));
-
-    // Reset form if it was using this category
-    if (form.category === categoryToDelete) {
-      setForm((prev) => ({ ...prev, category: '' }));
-    }
-
-    // Reload products to reflect changes and refresh categories
-    await loadProducts();
   };
 
   const seedDefaults = async () => {
