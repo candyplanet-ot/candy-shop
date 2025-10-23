@@ -60,32 +60,6 @@ const Index = () => {
   const homeHeroBg = (import.meta as any).env?.VITE_HOME_HERO_BG_URL || defaultHeroImage || heroPatternUrl;
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const featuredProducts = [
-    {
-      name: "Rainbow Swirl Lollipops",
-      price: "€4.99",
-      image: "/product-1.png",
-      description: "Handcrafted rainbow lollipops with natural fruit flavors"
-    },
-    {
-      name: "Premium Chocolate Truffles", 
-      price: "€12.99",
-      image: "/product-2.png",
-      description: "Belgian chocolate truffles with exotic fillings"
-    },
-    {
-      name: "Magical Gummy Bears",
-      price: "€6.99", 
-      image: "/product-3.png",
-      description: "Soft, chewy gummies in 12 magical flavors"
-    },
-    {
-      name: "Cloud Cotton Candy",
-      price: "€3.99",
-      image: "/product-4.png",
-      description: "Fluffy cotton candy that melts in your mouth"
-    }
-  ];
 
   const whyChooseUs = [
     {
@@ -111,11 +85,11 @@ const Index = () => {
   ];
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % featuredProducts.length);
+    setCurrentSlide((prev) => (prev + 1) % 1);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + featuredProducts.length) % featuredProducts.length);
+    setCurrentSlide((prev) => (prev - 1 + 1) % 1);
   };
 
   return (
@@ -233,80 +207,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured Products Carousel */}
-      <section className="py-20 bg-gradient-to-br from-secondary/10 to-accent/10">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-5xl md:text-6xl font-baloo font-bold bg-gradient-candy bg-clip-text text-transparent mb-6">
-              Friandises Magiques Vedettes
-            </h2>
-            <p className="text-xl font-poppins text-muted-foreground max-w-2xl mx-auto">
-              Découvrez le goût de la magie avec nos friandises vedettes
-            </p>
-          </div>
-
-          {/* Desktop Grid */}
-          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredProducts.map((product, index) => (
-              <Card 
-                key={index}
-                className="neon-gradient-card hover-tilt hover-bounce group transition-all duration-300"
-              >
-                <CardContent className="p-6 text-center">
-                  <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-primary/10 to-accent/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-16 h-16 object-contain"
-                    />
-                  </div>
-                  <h3 className="text-xl font-baloo font-bold mb-2 group-hover:text-primary transition-colors">
-                    {product.name}
-                  </h3>
-                  <p className="font-poppins text-sm text-muted-foreground mb-4">
-                    {product.description}
-                  </p>
-                  <div className="text-2xl font-baloo font-bold text-primary mb-4">
-                    {product.price}
-                  </div>
-                  <Link to="/products">
-                    <Button variant="sweet" className="w-full hover-bounce">
-                      Commander Maintenant
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Mobile Carousel */}
-          <div className="md:hidden relative">
-            <Carousel className="w-full">
-              <CarouselContent>
-                {featuredProducts.map((product, index) => (
-                  <CarouselItem key={index} className="px-3">
-                    <Card className="neon-gradient-card">
-                      <CardContent className="p-5 text-center">
-                        <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-primary/10 to-accent/10 rounded-full flex items-center justify-center">
-                          <img src={product.image} alt={product.name} className="w-14 h-14 object-contain" />
-                        </div>
-                        <h3 className="text-lg font-baloo font-bold mb-2">{product.name}</h3>
-                        <p className="font-poppins text-sm text-muted-foreground mb-3">{product.description}</p>
-                        <div className="text-xl font-baloo font-bold text-primary mb-3">{product.price}</div>
-                        <Link to="/products">
-                          <Button variant="sweet" className="w-full">Order Now</Button>
-                        </Link>
-                      </CardContent>
-                    </Card>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="left-2 bg-background/90" />
-              <CarouselNext className="right-2 bg-background/90" />
-            </Carousel>
-          </div>
-        </div>
-      </section>
 
       {/* Why Choose Us */}
       <section className="py-20">

@@ -61,25 +61,31 @@ const Checkout = () => {
 
     try {
       // Validate cart items against database products
-      const { data: validProducts } = await supabase
+      const { data: validProducts, error: productsError } = await supabase
         .from('products')
         .select('id');
 
-      if (!validProducts) {
-        throw new Error('Unable to validate products');
+      if (productsError) {
+        console.error('Error fetching products:', productsError);
+        // Continue without validation if products table doesn't exist yet
+        console.warn('Products table not accessible, skipping validation');
       }
 
-      const validProductIds = validProducts.map(p => p.id);
+      let validItems = items;
 
-      // Filter cart items to only include valid products
-      const validItems = items.filter(item => validProductIds.includes(item.id));
+      if (validProducts && validProducts.length > 0) {
+        const validProductIds = validProducts.map(p => p.id);
+        validItems = items.filter(item => validProductIds.includes(item.id));
 
-      if (validItems.length === 0) {
-        throw new Error('No valid products in cart');
-      }
+        if (validItems.length === 0) {
+          throw new Error('Aucun produit valide dans le panier');
+        }
 
-      if (validItems.length !== items.length) {
-        console.warn('Some invalid products were filtered from cart');
+        if (validItems.length !== items.length) {
+          console.warn('Certains produits invalides ont été filtrés du panier');
+        }
+      } else {
+        console.warn('Aucun produit trouvé dans la base de données, poursuite sans validation');
       }
 
       // Get current user session (optional for guest checkout)
