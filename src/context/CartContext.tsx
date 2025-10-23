@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 export type CartItem = {
   id: string; // product id (uuid or string)
@@ -15,51 +16,189 @@ type CartContextValue = {
   updateQuantity: (id: string, quantity: number) => void;
   clear: () => void;
   subtotal: number;
+  loading: boolean;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-const STORAGE_KEY = "cart:v1";
-
 export const CartProvider = ({ children }: { children: JSX.Element }) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [guestToken, setGuestToken] = useState<string | null>(null);
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setItems(JSON.parse(raw));
-    } catch {}
+  // Generate or get guest token for anonymous users
+  const getGuestToken = useCallback(() => {
+    let token = localStorage.getItem('guest_token');
+    if (!token) {
+      token = crypto.randomUUID();
+      localStorage.setItem('guest_token', token);
+    }
+    return token;
   }, []);
 
-  useEffect(() => {
+  // Load cart from Supabase
+  const loadCart = useCallback(async () => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch {}
-  }, [items]);
+      const { data: session } = await supabase.auth.getSession();
+      const userId = session.session?.user.id;
+      const token = userId ? null : getGuestToken();
 
-  const addItem = useCallback((item: Omit<CartItem, "quantity">, qty = 1) => {
+      if (!userId && !token) return;
+
+      const { data, error } = await supabase
+        .from('cart_items')
+        .select(`
+          id,
+          quantity,
+          products (
+            id,
+            name,
+            price,
+            image
+          )
+        `)
+        .eq(userId ? 'user_id' : 'guest_token', userId || token);
+
+      if (error) {
+        console.error('Error loading cart:', error);
+        return;
+      }
+
+      if (data) {
+        const cartItems: CartItem[] = data.map(item => ({
+          id: (item.products as any).id,
+          name: (item.products as any).name,
+          price: Number((item.products as any).price),
+          imageUrl: (item.products as any).image,
+          quantity: item.quantity
+        })).filter(item => !isNaN(item.price) && item.price > 0);
+
+        setItems(cartItems);
+      }
+    } catch (error) {
+      console.error('Error loading cart:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [getGuestToken]);
+
+  // Save cart item to Supabase
+  const saveCartItem = useCallback(async (item: CartItem) => {
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      const userId = session.session?.user.id;
+      const token = userId ? null : getGuestToken();
+
+      if (!userId && !token) return;
+
+      const { error } = await supabase
+        .from('cart_items')
+        .upsert({
+          user_id: userId,
+          guest_token: token,
+          product_id: item.id,
+          quantity: item.quantity
+        }, {
+          onConflict: userId ? 'user_id,product_id' : 'guest_token,product_id'
+        });
+
+      if (error) {
+        console.error('Error saving cart item:', error);
+      }
+    } catch (error) {
+      console.error('Error saving cart item:', error);
+    }
+  }, [getGuestToken]);
+
+  // Remove cart item from Supabase
+  const removeCartItem = useCallback(async (productId: string) => {
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      const userId = session.session?.user.id;
+      const token = userId ? null : getGuestToken();
+
+      if (!userId && !token) return;
+
+      const { error } = await supabase
+        .from('cart_items')
+        .delete()
+        .eq(userId ? 'user_id' : 'guest_token', userId || token)
+        .eq('product_id', productId);
+
+      if (error) {
+        console.error('Error removing cart item:', error);
+      }
+    } catch (error) {
+      console.error('Error removing cart item:', error);
+    }
+  }, [getGuestToken]);
+
+  // Clear cart from Supabase
+  const clearCart = useCallback(async () => {
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      const userId = session.session?.user.id;
+      const token = userId ? null : getGuestToken();
+
+      if (!userId && !token) return;
+
+      const { error } = await supabase
+        .from('cart_items')
+        .delete()
+        .eq(userId ? 'user_id' : 'guest_token', userId || token);
+
+      if (error) {
+        console.error('Error clearing cart:', error);
+      }
+    } catch (error) {
+      console.error('Error clearing cart:', error);
+    }
+  }, [getGuestToken]);
+
+  useEffect(() => {
+    loadCart();
+  }, [loadCart]);
+
+  const addItem = useCallback(async (item: Omit<CartItem, "quantity">, qty = 1) => {
     setItems((prev) => {
       const existing = prev.find((p) => p.id === item.id);
       if (existing) {
-        return prev.map((p) => (p.id === item.id ? { ...p, quantity: p.quantity + qty } : p));
+        const updated = prev.map((p) => (p.id === item.id ? { ...p, quantity: p.quantity + qty } : p));
+        saveCartItem({ ...existing, quantity: existing.quantity + qty });
+        return updated;
       }
-      return [...prev, { ...item, quantity: qty }];
+      const newItem = { ...item, quantity: qty };
+      saveCartItem(newItem);
+      return [...prev, newItem];
     });
-  }, []);
+  }, [saveCartItem]);
 
   const removeItem = useCallback((id: string) => {
-    setItems((prev) => prev.filter((p) => p.id !== id));
-  }, []);
+    setItems((prev) => {
+      removeCartItem(id);
+      return prev.filter((p) => p.id !== id);
+    });
+  }, [removeCartItem]);
 
   const updateQuantity = useCallback((id: string, quantity: number) => {
-    setItems((prev) => prev.map((p) => (p.id === id ? { ...p, quantity: Math.max(1, quantity) } : p)));
-  }, []);
+    setItems((prev) => prev.map((p) => {
+      if (p.id === id) {
+        const updatedItem = { ...p, quantity: Math.max(1, quantity) };
+        saveCartItem(updatedItem);
+        return updatedItem;
+      }
+      return p;
+    }));
+  }, [saveCartItem]);
 
-  const clear = useCallback(() => setItems([]), []);
+  const clear = useCallback(() => {
+    clearCart();
+    setItems([]);
+  }, [clearCart]);
 
-  const subtotal = useMemo(() => items.reduce((sum, i) => sum + i.price * i.quantity, 0), [items]);
+  const subtotal = useMemo(() => items.reduce((sum, i) => sum + (i.price || 0) * (i.quantity || 0), 0), [items]);
 
-  const value: CartContextValue = { items, addItem, removeItem, updateQuantity, clear, subtotal };
+  const value: CartContextValue = { items, addItem, removeItem, updateQuantity, clear, subtotal, loading };
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
 
