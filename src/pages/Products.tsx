@@ -192,7 +192,7 @@ const Products = () => {
                         const priceNumber = typeof product.price === 'string'
                           ? Number(String(product.price).replace(/[^0-9.]/g, "")) / 100
                           : Number(product.price) / 100;
-                        addItem({ id: String(product.id), name: product.name, price: priceNumber, imageUrl: product.image });
+                        addItem({ id: String(product.id), name: product.name, price: priceNumber / 100, imageUrl: product.image });
                         toast({ title: "Added to cart", description: product.name });
                       }}
                     >

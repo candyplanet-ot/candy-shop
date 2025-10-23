@@ -120,7 +120,7 @@ const ProductsAdmin = () => {
     setForm({
       name: p.name,
       category: p.category,
-      price: p.price,
+      price: p.price / 100, // Convert cents to euros for form display
       image: p.image,
       featured: p.featured,
       description: p.description,
@@ -143,10 +143,11 @@ const ProductsAdmin = () => {
           return;
         }
       } else {
-        // Generate a unique ID for new products
+        // Generate a unique ID for new products and convert price to cents
         const productData = {
           ...form,
-          id: crypto.randomUUID()
+          id: crypto.randomUUID(),
+          price: Math.round(form.price * 100) // Convert euros to cents for database
         };
         const { error } = await supabase.from("products").insert(productData);
         if (error) {
@@ -270,7 +271,7 @@ const ProductsAdmin = () => {
                   <div key={p.id} className="rounded-lg border p-4 space-y-2">
                     <div className="font-bold">{p.name}</div>
                     <div className="text-sm text-muted-foreground">{p.category}</div>
-                    <div className="text-sm">€{p.price}</div>
+                    <div className="text-sm">€{(p.price / 100).toFixed(2)}</div>
                     <div className="text-sm">In stock: {p.stock}</div>
                     <div className="text-sm line-clamp-2">{p.description}</div>
                     <div className="flex gap-2 pt-2">
