@@ -60,6 +60,28 @@ const Checkout = () => {
     setLoading(true);
 
     try {
+      // Validate cart items against database products
+      const { data: validProducts } = await supabase
+        .from('products')
+        .select('id');
+
+      if (!validProducts) {
+        throw new Error('Unable to validate products');
+      }
+
+      const validProductIds = validProducts.map(p => p.id);
+
+      // Filter cart items to only include valid products
+      const validItems = items.filter(item => validProductIds.includes(item.id));
+
+      if (validItems.length === 0) {
+        throw new Error('No valid products in cart');
+      }
+
+      if (validItems.length !== items.length) {
+        console.warn('Some invalid products were filtered from cart');
+      }
+
       // Get current user session (optional for guest checkout)
       const { data } = await supabase.auth.getSession();
 
@@ -94,7 +116,7 @@ const Checkout = () => {
         return uuidRegex.test(uuid);
       };
 
-      const orderItems = items
+      const orderItems = validItems
         .map((i) => ({
           order_id: String(order.id),
           product_id: String(i.id),
