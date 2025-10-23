@@ -43,9 +43,15 @@ export const CartProvider = ({ children }: { children: JSX.Element }) => {
       const userId = session.session?.user.id;
       const token = userId ? null : getGuestToken();
 
-      if (!userId && !token) return;
+      console.log('Loading cart for:', userId ? `user ${userId}` : `guest ${token}`);
 
-      const { data, error } = await supabase
+      if (!userId && !token) {
+        console.log('No user or token, skipping cart load');
+        setLoading(false);
+        return;
+      }
+
+      let query = supabase
         .from('cart_items')
         .select(`
           id,
@@ -56,27 +62,45 @@ export const CartProvider = ({ children }: { children: JSX.Element }) => {
             price,
             image
           )
-        `)
-        .eq(userId ? 'user_id' : 'guest_token', userId || token);
+        `);
+
+      if (userId) {
+        query = query.eq('user_id', userId);
+      } else if (token) {
+        query = query.eq('guest_token', token);
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('Error loading cart:', error);
+        setLoading(false);
         return;
       }
 
-      if (data) {
-        const cartItems: CartItem[] = data.map(item => ({
-          id: (item.products as any).id,
-          name: (item.products as any).name,
-          price: Number((item.products as any).price),
-          imageUrl: (item.products as any).image,
-          quantity: item.quantity
-        })).filter(item => !isNaN(item.price) && item.price > 0);
+      console.log('Cart data received:', data);
 
+      if (data && data.length > 0) {
+        const cartItems: CartItem[] = data
+          .filter(item => item.products) // Ensure product exists
+          .map(item => ({
+            id: String((item.products as any).id),
+            name: String((item.products as any).name || 'Unknown Product'),
+            price: Number((item.products as any).price) || 0,
+            imageUrl: (item.products as any).image,
+            quantity: Number(item.quantity) || 1
+          }))
+          .filter(item => item.price > 0 && item.quantity > 0 && !isNaN(item.price));
+
+        console.log('Processed cart items:', cartItems);
         setItems(cartItems);
+      } else {
+        console.log('No cart items found');
+        setItems([]);
       }
     } catch (error) {
       console.error('Error loading cart:', error);
+      setItems([]);
     } finally {
       setLoading(false);
     }
