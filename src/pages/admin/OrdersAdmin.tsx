@@ -240,7 +240,7 @@ const OrdersAdmin = () => {
                       </div>
                       {order.subtotal && (
                         <div className="mt-2 font-semibold text-lg border-t pt-2">
-                          Total : €{(order.subtotal / 100).toFixed(2)}
+                          Total : €{order.subtotal.toFixed(2)}
                         </div>
                       )}
                     </div>

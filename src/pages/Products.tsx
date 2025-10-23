@@ -83,7 +83,7 @@ const Products = () => {
       id: p.id,
       name: p.name,
       category: p.category,
-      price: typeof p.price === 'number' ? `€${(p.price / 100).toFixed(2)}` : String(p.price),
+      price: typeof p.price === 'number' ? `€${p.price.toFixed(2)}` : String(p.price),
       image: p.image,
       featured: !!p.featured,
       description: p.description ?? '',
@@ -189,8 +189,8 @@ const Products = () => {
                       variant="default" 
                       className="flex-1 bg-gradient-candy hover:opacity-90 text-white border-0"
                       onClick={() => {
-                        // product.price is in cents from database, convert to euros for cart
-                        const priceInEuros = Number(product.price) / 100;
+                        // product.price is already in euros from database
+                        const priceInEuros = Number(product.price);
                         addItem({ id: String(product.id), name: product.name, price: priceInEuros, imageUrl: product.image });
                         toast({ title: "Added to cart", description: product.name });
                       }}

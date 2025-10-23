@@ -97,7 +97,7 @@ const Checkout = () => {
         .insert({
           user_id: data.session?.user.id || null, // null for guests
           status: "pending",
-          subtotal: Math.round(subtotal * 100), // Store subtotal in cents (matches DB column name)
+          subtotal: subtotal, // Store subtotal in euros
           shipping_address: {
             address1: form.address1,
             address2: form.address2,
