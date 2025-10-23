@@ -83,14 +83,22 @@ export const CartProvider = ({ children }: { children: JSX.Element }) => {
       if (data && data.length > 0) {
         const cartItems: CartItem[] = data
           .filter(item => item.products) // Ensure product exists
-          .map(item => ({
-            id: String((item.products as any).id),
-            name: String((item.products as any).name || 'Unknown Product'),
-            price: Number((item.products as any).price) || 0,
-            imageUrl: (item.products as any).image,
-            quantity: Number(item.quantity) || 1
-          }))
-          .filter(item => item.price > 0 && item.quantity > 0 && !isNaN(item.price));
+          .map(item => {
+            const price = Number((item.products as any).price);
+            console.log('Processing cart item:', item.products, 'price:', price, 'isNaN:', isNaN(price));
+            return {
+              id: String((item.products as any).id),
+              name: String((item.products as any).name || 'Unknown Product'),
+              price: price,
+              imageUrl: (item.products as any).image,
+              quantity: Number(item.quantity) || 1
+            };
+          })
+          .filter(item => {
+            const isValid = item.price > 0 && item.quantity > 0 && !isNaN(item.price);
+            console.log('Cart item validity check:', item.name, 'price:', item.price, 'valid:', isValid);
+            return isValid;
+          });
 
         console.log('Processed cart items:', cartItems);
         setItems(cartItems);
@@ -113,21 +121,33 @@ export const CartProvider = ({ children }: { children: JSX.Element }) => {
       const userId = session.session?.user.id;
       const token = userId ? null : getGuestToken();
 
-      if (!userId && !token) return;
+      console.log('Saving cart item:', item, 'for user:', userId, 'token:', token);
 
-      const { error } = await supabase
+      if (!userId && !token) {
+        console.log('No user or token, cannot save cart item');
+        return;
+      }
+
+      const cartData = {
+        user_id: userId,
+        guest_token: token,
+        product_id: item.id,
+        quantity: item.quantity
+      };
+
+      console.log('Cart data to save:', cartData);
+
+      const { data, error } = await supabase
         .from('cart_items')
-        .upsert({
-          user_id: userId,
-          guest_token: token,
-          product_id: item.id,
-          quantity: item.quantity
-        }, {
+        .upsert(cartData, {
           onConflict: userId ? 'user_id,product_id' : 'guest_token,product_id'
-        });
+        })
+        .select();
 
       if (error) {
         console.error('Error saving cart item:', error);
+      } else {
+        console.log('Cart item saved successfully:', data);
       }
     } catch (error) {
       console.error('Error saving cart item:', error);
