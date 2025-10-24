@@ -181,10 +181,36 @@ const OrdersAdmin = () => {
               <div className="space-y-4">
                 {orders.map((order) => (
                   <div key={order.id} className="border rounded-lg p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
                       <div>
                         <h3 className="font-semibold">ID Commande</h3>
                         <p className="text-sm text-gray-600">{order.id}</p>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">Produits</h3>
+                        <div className="flex flex-wrap gap-1">
+                          {order.items && order.items.slice(0, 3).map((item, index) => (
+                            <div key={index} className="relative">
+                              {item.product_image ? (
+                                <img
+                                  src={item.product_image}
+                                  alt={item.product_name}
+                                  className="w-8 h-8 object-cover rounded border"
+                                  title={item.product_name}
+                                />
+                              ) : (
+                                <div className="w-8 h-8 bg-gray-200 rounded border flex items-center justify-center text-xs">
+                                  {item.product_name.charAt(0)}
+                                </div>
+                              )}
+                              {order.items && order.items.length > 3 && index === 2 && (
+                                <div className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                                  +{order.items.length - 3}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                       <div>
                         <h3 className="font-semibold">Client</h3>
