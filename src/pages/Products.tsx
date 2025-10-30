@@ -163,7 +163,7 @@ const Products = () => {
                     <img
                       src={product.image}
                       alt={product.name}
-                      className={`${product.name === "Fruit Explosion Gummies" ? "w-[190px] h-[190px]" : "w-24 h-24"} object-contain group-hover:scale-110 transition-transform duration-300`}
+                      className="w-[170px] h-[170px] object-contain group-hover:scale-110 transition-transform duration-300"
                       onError={(ev) => {
                         (ev.currentTarget as HTMLImageElement).src = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240"><rect width="100%" height="100%" fill="#f4f4f5"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#a1a1aa" font-family="Arial" font-size="12">Image not available</text></svg>');
                       }}
