@@ -78,6 +78,7 @@ const ProductsAdmin = () => {
         const { data: pub } = supabase.storage.from("gallery").getPublicUrl(fullPath);
         return { path: fullPath, url: pub.publicUrl, name: f.name };
       });
+      console.log(`Gallery loaded ${items.length} images`);
       setGalleryItems(items);
     }
     setGalleryLoading(false);
@@ -405,23 +406,25 @@ const ProductsAdmin = () => {
             ) : galleryItems.length === 0 ? (
               <div className="text-sm text-muted-foreground">No images yet.</div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {galleryItems.map((it) => (
-                  <button
-                    key={it.path}
-                    type="button"
-                    className="border rounded-lg overflow-hidden hover:ring-2 ring-primary"
-                    onClick={() => {
-                      setForm((prev) => ({ ...prev, image: it.url }));
-                      setGalleryOpen(false);
-                    }}
-                  >
-                    <div className="aspect-square bg-muted">
-                      <img src={it.url} alt={it.name} className="object-cover w-full h-full" />
-                    </div>
-                    <div className="text-xs p-2 truncate" title={it.name}>{it.name}</div>
-                  </button>
-                ))}
+              <div className="max-h-96 overflow-y-auto">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {galleryItems.map((it) => (
+                    <button
+                      key={it.path}
+                      type="button"
+                      className="border rounded-lg overflow-hidden hover:ring-2 ring-primary"
+                      onClick={() => {
+                        setForm((prev) => ({ ...prev, image: it.url }));
+                        setGalleryOpen(false);
+                      }}
+                    >
+                      <div className="aspect-square bg-muted">
+                        <img src={it.url} alt={it.name} className="object-cover w-full h-full" />
+                      </div>
+                      <div className="text-xs p-2 truncate" title={it.name}>{it.name}</div>
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </DialogContent>
