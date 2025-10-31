@@ -9,15 +9,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type Product = {
-  id: number;
-  name: string;
-  category: string;
-  price: number;
-  image: string;
-  featured: boolean;
-  description: string;
-  stock: number;
-};
+   id: number;
+   name: string;
+   category: string;
+   price: number | string;
+   image: string;
+   featured: boolean;
+   description: string;
+   stock: number;
+ };
 
 const emptyProduct: Omit<Product, "id"> = {
   name: "",
@@ -119,7 +119,7 @@ const ProductsAdmin = () => {
     setForm({
       name: p.name,
       category: p.category,
-      price: p.price, // Price is already in euros
+      price: (Number(p.price) / 100).toString(), // Convert from cents back to euros for editing
       image: p.image,
       featured: p.featured,
       description: p.description,
@@ -134,8 +134,21 @@ const ProductsAdmin = () => {
 
   const save = async () => {
     try {
+      // Convert price to cents (integer) for database storage
+      const priceValue = parseFloat(form.price.toString().replace(',', '.'));
+      const priceInCents = Math.round(priceValue * 100);
+
+      console.log('Original price:', priceValue, 'Price in cents:', priceInCents);
+
+      const productData = {
+        ...form,
+        price: priceInCents
+      };
+
+      console.log('Product data being saved:', productData);
+
       if (editing) {
-        const { error } = await supabase.from("products").update(form).eq("id", editing.id);
+        const { error } = await supabase.from("products").update(productData).eq("id", editing.id);
         if (error) {
           console.error('Error updating product:', error);
           alert('Error updating product: ' + error.message);
@@ -143,11 +156,11 @@ const ProductsAdmin = () => {
         }
       } else {
         // Generate a unique ID for new products - price is already in euros
-        const productData = {
-          ...form,
+        const newProductData = {
+          ...productData,
           id: crypto.randomUUID()
         };
-        const { error } = await supabase.from("products").insert(productData);
+        const { error } = await supabase.from("products").insert(newProductData);
         if (error) {
           console.error('Error creating product:', error);
           alert('Error creating product: ' + error.message);
@@ -232,7 +245,7 @@ const ProductsAdmin = () => {
       {
         name: "Rainbow Swirl Lollipops",
         category: "Lollipops",
-        price: 4.99,
+        price: 499, // 4.99 in cents
         image: "/product-1.png",
         featured: true,
         description: "Handcrafted rainbow lollipops with natural fruit flavors",
@@ -241,7 +254,7 @@ const ProductsAdmin = () => {
       {
         name: "Premium Chocolate Truffles",
         category: "Chocolates",
-        price: 12.99,
+        price: 1299, // 12.99 in cents
         image: "/product-2.png",
         featured: true,
         description: "Belgian chocolate truffles with exotic fillings",
@@ -250,7 +263,7 @@ const ProductsAdmin = () => {
       {
         name: "Magical Gummy Bears",
         category: "Gummies",
-        price: 6.99,
+        price: 699, // 6.99 in cents
         image: "/product-3.png",
         featured: false,
         description: "Soft, chewy gummies in 12 magical flavors",
@@ -259,7 +272,7 @@ const ProductsAdmin = () => {
       {
         name: "Cloud Cotton Candy",
         category: "Cotton Candy",
-        price: 3.99,
+        price: 399, // 3.99 in cents
         image: "/product-4.png",
         featured: false,
         description: "Fluffy cotton candy that melts in your mouth",
@@ -296,7 +309,7 @@ const ProductsAdmin = () => {
                   <div key={p.id} className="rounded-lg border p-4 space-y-2">
                     <div className="font-bold">{p.name}</div>
                     <div className="text-sm text-muted-foreground">{p.category}</div>
-                    <div className="text-sm">€{p.price.toFixed(2)}</div>
+                    <div className="text-sm">€{(Number(p.price) / 100).toFixed(2)}</div>
                     <div className="text-sm">In stock: {p.stock}</div>
                     <div className="text-sm line-clamp-2">{p.description}</div>
                     <div className="flex gap-2 pt-2">
@@ -367,7 +380,25 @@ const ProductsAdmin = () => {
               </div>
               <div>
                 <Label>Price (number)</Label>
-                <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} />
+                <Input
+                  type="text"
+                  inputMode="decimal"
+                  pattern="[0-9]+([.,][0-9]{1,2})?"
+                  value={form.price}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(',', '.');
+                    const numValue = parseFloat(value);
+                    if (e.target.value === '' || !isNaN(numValue)) {
+                      setForm({ ...form, price: e.target.value });
+                    }
+                  }}
+                  onBlur={() => {
+                    const normalized = parseFloat(form.price.toString().replace(',', '.'));
+                    if (!isNaN(normalized)) {
+                      setForm({ ...form, price: normalized.toFixed(2) });
+                    }
+                  }}
+                />
               </div>
               <div>
                 <Label>Stock (quantity)</Label>
