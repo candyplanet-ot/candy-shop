@@ -117,8 +117,11 @@ const Index = () => {
             className="w-full h-full"
           >
             <AdaptiveDpr pixelated />
-            <ambientLight intensity={0.6} />
-            <directionalLight position={[2, 4, 3]} intensity={1} />
+            <ambientLight intensity={1.0} />
+            <directionalLight position={[2, 4, 3]} intensity={1.5} />
+            <pointLight position={[-2, 2, 2]} intensity={1.2} />
+            <pointLight position={[2, -2, -2]} intensity={1.0} />
+            <hemisphereLight args={["#ffffff", "#444444", 0.6]} />
             <Suspense fallback={null}>
               {/* Floating candies (ambient) */}
               <Float speed={1} rotationIntensity={0.4} floatIntensity={0.6}>
@@ -147,7 +150,6 @@ const Index = () => {
                 </group>
               </Float>
 
-              <Environment preset="sunset" />
               <ContactShadows position={[0, -1.3, 0]} opacity={0.15} scale={8} blur={2} far={2.5} />
               <Preload all />
             </Suspense>

@@ -98,8 +98,8 @@ export const CartProvider = ({ children }: { children: JSX.Element }) => {
         const cartItems: CartItem[] = data
           .filter(item => item.products) // Ensure product exists
           .map(item => {
-            const price = Number((item.products as any).price);
-            console.log('Processing cart item:', item.products, 'price:', price, 'isNaN:', isNaN(price));
+            const price = Number((item.products as any).price) / 100; // Convert from cents to euros
+            console.log('Processing cart item:', item.products, 'price in cents:', (item.products as any).price, 'price in euros:', price, 'isNaN:', isNaN(price));
             return {
               id: String((item.products as any).id),
               name: String((item.products as any).name || 'Unknown Product'),
