@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://candy-planet.com/sitemap.xml
+Sitemap: https://candyplanet.fr/sitemap.xml
