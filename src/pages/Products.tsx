@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Link, useNavigate } from "react-router-dom";
+import { Helmet } from 'react-helmet-async';
 
 const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -119,6 +120,33 @@ const Products = () => {
           </p>
         </div>
       </section>
+
+      {/* Structured Data for Products */}
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": "Candy Planet Products",
+            "description": "Collection of magical candies and artisanal sweets",
+            "url": "https://candyplanet.fr/products",
+            "numberOfItems": filteredProducts.length,
+            "itemListElement": filteredProducts.slice(0, 10).map((product, index) => ({
+              "@type": "Product",
+              "position": index + 1,
+              "name": product.name,
+              "description": product.description,
+              "image": product.image,
+              "offers": {
+                "@type": "Offer",
+                "price": product.price,
+                "priceCurrency": "EUR",
+                "availability": "https://schema.org/InStock"
+              }
+            }))
+          })}
+        </script>
+      </Helmet>
 
       {/* Category Filters */}
       <section className="pt-6">
