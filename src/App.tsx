@@ -24,6 +24,7 @@ import GalleryAdmin from "./pages/admin/GalleryAdmin";
 import OrdersAdmin from "./pages/admin/OrdersAdmin";
 import Footer from "./components/Footer";
 import SEOHead from "./components/SEOHead";
+import { ClosureTape } from "./components/ClosureTape";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <SEOHead />
+        <ClosureTape />
         <CartProvider>
           <>
           <Navigation />
