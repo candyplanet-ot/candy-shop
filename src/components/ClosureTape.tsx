@@ -54,6 +54,17 @@ export const ClosureTape = () => {
             >
               optimum.tech.911@gmail.com
             </a>
+            <br />
+            Notre site :{' '}
+            <a
+              href="https://optimutech.fr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:opacity-80 transition-opacity pointer-events-auto"
+              style={{ pointerEvents: 'auto' }}
+            >
+              optimutech.fr
+            </a>
           </span>
         </div>
       </div>
